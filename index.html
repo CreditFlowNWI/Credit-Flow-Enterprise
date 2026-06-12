@@ -1,0 +1,3314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreditFlow — New Way International</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f7f4;--surface:#fff;--surface2:#f5fbf8;--surface3:#edf7f2;
+  --border:#d4eade;--border2:#c2dfd0;
+  --text:#1a2e25;--text2:#4a6b5a;--text3:#7a9b8a;
+  --green:#2d7a52;--green-bg:#e8f5ee;--green-mid:#b8dfc9;--green-dark:#1a5c3a;--mint:#a8d5bb;--sage:#6baa85;
+  --amber:#92600e;--amber-bg:#fef6e8;--amber-border:#f5c87a;
+  --red:#b91c1c;--red-bg:#fef2f2;--red-border:#fca5a5;
+  --blue:#1e4d8c;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --navy:#0f2d4a;--navy-bg:#e8eef5;--navy-border:#b0c0d4;
+  --r:12px;--rsm:8px;
+  --sh:0 1px 3px rgba(45,122,82,.08);--shm:0 4px 16px rgba(45,122,82,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.hdr{background:linear-gradient(135deg,#1a5c3a,#2d7a52 60%,#3a9166);padding:0 28px;display:flex;align-items:center;gap:12px;height:62px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(26,92,58,.25)}
+.hdr-logo{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,.25)}
+.hdr-logo svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.hdr-brand{font-size:18px;font-weight:700;letter-spacing:-.4px;color:white}
+.hdr-brand span{font-weight:300;opacity:.8}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:1px}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.hdr-date{font-size:11px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.12);padding:3px 9px;border-radius:20px}
+.hdr-status{font-size:11px;color:#93c5fd;font-weight:600;display:none;background:rgba(255,255,255,.12);padding:3px 9px;border-radius:20px}
+#alerts-bar{padding:10px 28px 0}
+.top-alert{display:flex;align-items:center;gap:10px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r);padding:10px 14px;margin-bottom:7px;font-size:13px;color:var(--red);font-weight:500;box-shadow:var(--sh)}
+.top-alert strong{font-weight:700}
+.top-alert .ta-right{margin-left:auto;display:flex;align-items:center;gap:7px}
+.alert-x{background:none;border:none;cursor:pointer;color:var(--red);opacity:.6;font-size:16px;line-height:1;padding:2px 5px;border-radius:4px;transition:opacity .15s}
+.alert-x:hover{opacity:1;background:var(--red-border)}
+.sort-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sort-bar label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.sort-sel{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--rsm);padding:5px 10px;font-size:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;cursor:pointer}
+.sort-sel:focus{outline:none;border-color:var(--sage)}
+.tabs-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;margin-top:12px}
+.tabs{display:flex;overflow-x:auto;gap:0}
+.tab{padding:13px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text3);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .15s}
+.tab:hover{color:var(--green)}
+.tab.active{color:var(--green-dark);border-bottom-color:var(--green)}
+.tab svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tb{background:var(--red-bg);color:var(--red);font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700}
+.tb-a{background:var(--amber-bg);color:var(--amber);font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700}
+.main{padding:22px 28px;max-width:1200px}
+.panel{display:none}.panel.active{display:block}
+.sl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:0 0 8px}
+.ugrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.ugrid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.uz{border:2px dashed var(--border2);border-radius:var(--r);padding:20px 14px;text-align:center;cursor:pointer;background:var(--surface);transition:all .2s;position:relative;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:var(--sh)}
+.uz:hover{border-color:var(--sage);background:var(--surface2);transform:translateY(-1px);box-shadow:var(--shm)}
+.uz.ok{border:2px solid var(--green-mid);background:var(--green-bg)}
+.uz-rm{position:absolute;top:7px;right:9px;font-size:11px;cursor:pointer;display:none;align-items:center;gap:3px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-weight:500}
+.uz-rm:hover{color:var(--red)}
+.uz.ok .uz-rm{display:flex}
+.uz-icon{font-size:28px;margin-bottom:8px}
+.uz-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.uz-sub{font-size:11px;color:var(--text3)}
+.uz.ok .uz-title{color:var(--green-dark)}.uz.ok .uz-sub{color:var(--sage)}
+input[type=file]{display:none}
+.rbar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 16px;margin:14px 0;flex-wrap:wrap;box-shadow:var(--sh)}
+.ri{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);font-weight:500}
+.ri.ok{color:var(--green)}
+.rdiv{width:1px;height:14px;background:var(--border);flex-shrink:0}
+.rstatus{margin-left:auto;font-size:12px;font-weight:700}
+.rstatus.ready{color:var(--green)}.rstatus.notready{color:var(--text3)}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--rsm);padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s}
+.btn-p{background:linear-gradient(135deg,var(--green-dark),var(--green));color:white;box-shadow:0 2px 8px rgba(45,122,82,.3)}
+.btn-p:hover{opacity:.9;transform:translateY(-1px)}
+.btn-p:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-s{background:var(--surface);border:1.5px solid var(--border2);color:var(--text2)}
+.btn-s:hover{background:var(--surface2)}
+.btn-sm{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;transition:all .15s}
+.btn-sm:hover{background:var(--green-bg);border-color:var(--green-mid);color:var(--green)}
+.prog{height:4px;background:var(--border);border-radius:4px;overflow:hidden;display:none;margin-top:8px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green-dark),var(--mint));border-radius:4px;transition:width .3s}
+.pstatus{font-size:12px;color:var(--text3);margin-top:5px;min-height:16px;font-weight:500}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast-wrap{position:fixed;top:74px;right:18px;z-index:999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{display:flex;align-items:flex-start;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;font-size:12px;box-shadow:var(--shm);opacity:0;transform:translateX(18px);transition:all .22s;min-width:220px;max-width:320px;pointer-events:auto}
+.toast.show{opacity:1;transform:translateX(0)}
+.t-icon{font-size:16px;flex-shrink:0}
+.t-title{font-weight:700;margin-bottom:2px;font-size:12px}
+.t-msg{color:var(--text3);font-size:11px;line-height:1.4}
+.toast.tok{border-left:3px solid var(--green)}
+.toast.twarn{border-left:3px solid var(--amber)}
+.toast.terr{border-left:3px solid var(--red)}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green-dark),var(--mint))}
+.sc.red::before{background:linear-gradient(90deg,var(--red),#f87171)}
+.sc.amber::before{background:linear-gradient(90deg,var(--amber),#fbbf24)}
+.sc-l{font-size:11px;color:var(--text3);margin-bottom:7px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.sc-v{font-size:22px;font-weight:700;letter-spacing:-.5px}
+.sc-v.r{color:var(--red)}.sc-v.g{color:var(--green)}.sc-v.a{color:var(--amber)}
+.abox{display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-radius:var(--r);font-size:13px;margin-bottom:12px;line-height:1.55;border:1px solid;font-weight:500}
+.ai{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.ad{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.ao{background:var(--green-bg);color:var(--green-dark);border-color:var(--green-mid)}
+.aw{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:9px;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .15s}
+.card:hover{box-shadow:var(--shm)}
+.ch{display:flex;align-items:center;gap:9px;padding:12px 16px;cursor:pointer;transition:background .15s}
+.ch:hover{background:var(--surface2)}
+.cb{display:none;border-top:1px solid var(--border)}.cb.open{display:block}
+.cname{font-weight:600;font-size:14px;flex:1;min-width:0}
+.chev{font-size:13px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.chev.open{transform:rotate(180deg)}
+.badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+.bg{background:var(--green-bg);color:var(--green-dark);border:1px solid var(--green-mid)}
+.br{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.ba{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.bb{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+.bgr{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:9px 14px;font-weight:700;color:var(--text3);border-bottom:1px solid var(--border);background:var(--surface3);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.tbl td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text);font-size:13px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:var(--surface2)}
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:11px 14px;background:var(--surface3);border-top:1px solid var(--border)}
+.srl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-weight:700}
+.srv{font-weight:600;font-size:13px}
+.cl-card{background:var(--surface);border:1px solid var(--red-border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;box-shadow:var(--sh);border-left:4px solid var(--red)}
+.cl-header{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;transition:background .15s}
+.cl-header:hover{background:var(--red-bg)}
+.cl-body{display:none;border-top:1px solid var(--red-border)}.cl-body.open{display:block}
+.near-card{background:var(--surface);border:1px solid var(--amber-border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;box-shadow:var(--sh);border-left:4px solid var(--amber)}
+.near-header{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;transition:background .15s}
+.near-header:hover{background:var(--amber-bg)}
+.near-body{display:none;border-top:1px solid var(--amber-border)}.near-body.open{display:block}
+.ebox{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 16px;font-size:12px;line-height:1.8;white-space:pre-wrap;font-family:'DM Mono',monospace;max-height:260px;overflow-y:auto;margin-bottom:10px}
+.empty{text-align:center;padding:48px 16px;color:var(--text3)}
+.empty .ei{font-size:40px;margin-bottom:12px;opacity:.4}
+.empty p{font-size:14px;font-weight:500}
+.eform{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:var(--shm)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fg label{font-size:11px;color:var(--text3);display:block;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rsm);padding:8px 11px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .15s;font-weight:500}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--sage);background:var(--surface)}
+.fg textarea{resize:vertical;min-height:60px}
+.ff{grid-column:1/-1}
+.ecard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;box-shadow:var(--sh)}
+.ecard.ph{border-left:4px solid var(--red)}.ecard.pm{border-left:4px solid var(--amber)}.ecard.pl{border-left:4px solid var(--green)}
+.eh{display:flex;align-items:flex-start;gap:9px;margin-bottom:12px}
+.efields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ef{background:var(--surface2);border-radius:var(--rsm);padding:9px 11px;border:1px solid var(--border)}
+.efl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:700}
+.efv{font-size:12px;line-height:1.5;font-weight:500}
+.eff{grid-column:1/-1}
+.uz.dragover{border-color:var(--green);background:var(--green-bg);transform:scale(1.02)}
+.cust-input-wrap{position:relative;width:100%}
+.cust-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1.5px solid var(--green-mid);border-top:none;border-radius:0 0 var(--rsm) var(--rsm);max-height:180px;overflow-y:auto;z-index:500;box-shadow:var(--shm);display:none}
+.cust-dropdown.open{display:block}
+.cust-opt{padding:8px 11px;font-size:12px;cursor:pointer;color:var(--text);font-weight:500;transition:background .1s}
+.cust-opt:hover,.cust-opt.sel{background:var(--green-bg);color:var(--green-dark)}
+.prog-bar-wrap{background:var(--border);border-radius:4px;height:6px;overflow:hidden;margin:8px 0}
+.prog-bar{height:100%;border-radius:4px;transition:width .4s}
+.edraft-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.52);z-index:300;align-items:center;justify-content:center;padding:16px}
+.edraft-box{background:var(--surface);border-radius:var(--r);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.28);display:flex;flex-direction:column}
+.edraft-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;background:linear-gradient(135deg,var(--blue-bg),var(--surface))}
+.edraft-body{padding:18px 20px;flex:1}
+.edraft-section{margin-bottom:18px}
+.edraft-section-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.edraft-email-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 20px;font-size:13px;line-height:1.9;font-family:'Plus Jakarta Sans',sans-serif;white-space:pre-wrap;color:var(--text)}
+.edraft-table-insert{white-space:normal;margin:4px 0}
+.btn-email{display:inline-flex;align-items:center;gap:5px;background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:var(--rsm);padding:5px 11px;font-size:11px;cursor:pointer;color:var(--blue);font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;transition:all .15s;flex-shrink:0}
+.btn-email:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.emailed-tog{background:none;border:2px solid var(--border2);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;padding:0;color:transparent;flex-shrink:0}
+.emailed-tog.done{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.emailed-tog:hover{border-color:var(--green)}
+@media(max-width:720px){
+  .main,.hdr,#alerts-bar,.tabs-bar{padding-left:14px;padding-right:14px}
+  .ugrid,.ugrid2,.sgrid,.fgrid,.efields{grid-template-columns:1fr}
+  .srow{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="tw"></div>
+
+<div class="hdr">
+  <div class="hdr-logo"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+  <div><div class="hdr-brand">Credit<span>Flow</span></div><div class="hdr-sub">New Way International · Credit Control</div></div>
+  <div class="hdr-right"><div class="hdr-date" id="hdr-date"></div><div class="hdr-status" id="hdr-status"></div>
+    <button class="btn-sm" id="gmail-connect-btn" onclick="document.getElementById('gmail-panel').style.display=document.getElementById('gmail-panel').style.display==='none'?'block':'none'" style="font-size:11px;background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3);color:white">📧 Gmail</button>
+  </div>
+</div>
+
+<div id="gmail-panel" style="display:none;padding:10px 28px;background:#fff;border-bottom:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.07)">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:700px">
+    <span style="font-size:12px;font-weight:700;color:var(--text2)">Gmail Integration</span>
+    <input type="text" id="gmail-client-id" placeholder="Google OAuth Client ID (from Google Cloud Console)" style="flex:1;min-width:260px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rsm);padding:6px 10px;font-size:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif">
+    <button class="btn-sm" onclick="gmailConnect()">🔗 Connect Gmail</button>
+    <span id="gmail-status" style="font-size:11px;color:var(--text3);font-weight:600">○ Not connected</span>
+    <span style="font-size:11px;color:var(--text3)">Get your Client ID from <strong>Google Cloud Console → APIs → OAuth 2.0 Credentials</strong>. Add your site URL as an authorised origin.</span>
+  </div>
+</div>
+
+
+<div id="alerts-bar"></div>
+
+<div class="tabs-bar"><div class="tabs">
+  <button class="tab active" onclick="st('upload')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload</button>
+  <button class="tab" onclick="st('overdue')" id="t-overdue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Summary Aging</button>
+  <button class="tab" onclick="st('credit')" id="t-credit"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Aged Receivables</button>
+  <button class="tab" onclick="st('match')" id="t-match"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>Match Report</button>
+  <button class="tab" onclick="st('bulk')" id="t-bulk"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Bulk Emails</button>
+  <button class="tab" onclick="st('enquiry')" id="t-enq"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Enquiries</button>
+</div></div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════ UPLOAD ═══════════════════════════════════════ -->
+<div class="panel active" id="tab-upload">
+  <div class="abox ao" style="margin-bottom:16px">🌿 Upload your PDF reports below — all files optional. Process locally in your browser; no data is sent anywhere.</div>
+
+  <p class="sl" style="margin-bottom:10px">Aging Reports (PDF)</p>
+  <div class="ugrid" style="margin-bottom:20px">
+    <div>
+      <p class="sl">Customer — Summary Aging <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--text3)">(optional)</span></p>
+      <div class="uz" id="z-sa" onclick="document.getElementById('in-sa').click()">
+        <div class="uz-rm" onclick="event.stopPropagation();rmFile('sa')">✕ Remove</div>
+        <div class="uz-icon" id="zi-sa">📋</div>
+        <div class="uz-title" id="zt-sa">Customer Summary Aging PDF</div>
+        <div class="uz-sub" id="zs-sa">Overdue by col 4+5+6 · Balance list</div>
+        <div id="zf-sa" style="font-size:11px;font-weight:600;margin-top:5px;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:0 4px"></div>
+      </div>
+      <input type="file" id="in-sa" accept=".pdf" onchange="handlePDFUpload('sa',this)">
+    </div>
+    <div>
+      <p class="sl">Aging Accounts Receivable <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--text3)">(optional)</span></p>
+      <div class="uz" id="z-ar" onclick="document.getElementById('in-ar').click()">
+        <div class="uz-rm" onclick="event.stopPropagation();rmFile('ar')">✕ Remove</div>
+        <div class="uz-icon" id="zi-ar">📊</div>
+        <div class="uz-title" id="zt-ar">Aged Accounts Receivable PDF</div>
+        <div class="uz-sub" id="zs-ar">Credit limit · Overdue analysis</div>
+        <div id="zf-ar" style="font-size:11px;font-weight:600;margin-top:5px;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:0 4px"></div>
+      </div>
+      <input type="file" id="in-ar" accept=".pdf" onchange="handlePDFUpload('ar',this)">
+    </div>
+    <div>
+      <p class="sl">Customer Statement <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--text3)">(optional — for Match Report)</span></p>
+      <div class="uz" id="z-stmt" onclick="document.getElementById('in-stmt').click()">
+        <div class="uz-rm" onclick="event.stopPropagation();rmFile('stmt')">✕ Remove</div>
+        <div class="uz-icon" id="zi-stmt">📄</div>
+        <div class="uz-title" id="zt-stmt">Customer Statement PDF</div>
+        <div class="uz-sub" id="zs-stmt">Invoice details · Due dates</div>
+        <div id="zf-stmt" style="font-size:11px;font-weight:600;margin-top:5px;color:var(--green);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:0 4px"></div>
+      </div>
+      <input type="file" id="in-stmt" accept=".pdf" onchange="handlePDFUpload('stmt',this)">
+    </div>
+  </div>
+
+  <p class="sl" style="margin-bottom:10px">Remittances <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--text3)">(optional — upload PDF or log manually)</span></p>
+  <div class="ugrid2" style="max-width:600px;margin-bottom:10px">
+    <div class="uz" style="min-height:80px;padding:14px" onclick="document.getElementById('in-rem-pdf').click()">
+      <div class="uz-icon" style="font-size:20px;margin-bottom:4px">📄</div>
+      <div class="uz-title" style="font-size:12px">Upload remittance PDF</div>
+      <div class="uz-sub">AI reads invoice numbers &amp; amounts</div>
+    </div>
+    <div class="uz" style="min-height:80px;padding:14px;cursor:pointer" onclick="showRemForm()">
+      <div class="uz-icon" style="font-size:20px;margin-bottom:4px">✏️</div>
+      <div class="uz-title" style="font-size:12px">Log remittance manually</div>
+      <div class="uz-sub">Enter customer, invoices &amp; amount</div>
+    </div>
+  </div>
+  <input type="file" id="in-rem-pdf" accept=".pdf" multiple onchange="handleRemPDF(this)">
+  <div id="rem-pdf-status" style="font-size:12px;color:var(--text3);margin-bottom:6px;min-height:16px"></div>
+  <div id="rem-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:18px"></div>
+
+  <div class="rbar">
+    <div class="ri" id="ri-sa">○ Summary Aging</div><div class="rdiv"></div>
+    <div class="ri" id="ri-ar">○ Aged Receivables</div><div class="rdiv"></div>
+    <div class="ri" id="ri-stmt">○ Statement</div><div class="rdiv"></div>
+    <div class="ri" id="ri-rem">○ Remittances</div>
+    <div class="rstatus notready" id="rstatus">Upload at least one file to continue</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <button class="btn btn-p" id="run-btn" onclick="runCreditFlow()" disabled>⚡ Run CreditFlow</button>
+    <div>
+      <div class="prog" id="prog"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="pstatus" id="pstatus"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:14px;font-size:11px;color:var(--text3);margin-top:10px;font-weight:500;flex-wrap:wrap">
+    <span>📄 Upload PDFs exported from Dynamics/Business Central</span>
+    <span>⚡ Processed locally — no internet required</span>
+    <span>🔒 Your data never leaves your browser</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SUMMARY AGING ═══════════════════════════════════════ -->
+<div class="panel" id="tab-overdue">
+  <div id="ode" class="empty"><div class="ei">⏰</div><p>Upload the Customer — Summary Aging PDF and/or Aging Accounts Receivable PDF then run CreditFlow</p></div>
+  <div id="odc" style="display:none">
+    <div class="sgrid" id="od-stats"></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-p" onclick="exportSAXLSX()">⬇️ Export overdue + balances (.xlsx)</button>
+      <button class="btn-sm" onclick="expandAllClass('od-body')">▼ Expand all</button>
+      <button class="btn-sm" onclick="collapseAllClass('od-body')">▲ Collapse all</button>
+      <input type="text" id="od-filter" placeholder="Filter by name…" oninput="renderSummaryAgingTab()" style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--rsm);padding:5px 10px;font-size:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;width:180px">
+    </div>
+    <div class="sort-bar">
+      <label>Sort:</label>
+      <select class="sort-sel" id="od-sort" onchange="renderSummaryAgingTab()">
+        <option value="overdue-desc">Largest overdue first</option>
+        <option value="overdue-asc">Smallest overdue first</option>
+        <option value="name-asc">A → Z</option>
+        <option value="name-desc">Z → A</option>
+        <option value="balance-desc">Largest balance first</option>
+      </select>
+    </div>
+    <div id="od-list"></div>
+
+    <div style="margin-top:28px;padding-top:20px;border-top:2px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div>
+          <p class="sl" style="margin:0">All Customers With a Balance</p>
+          <p style="font-size:12px;color:var(--text3);margin-top:3px">From Summary Aging — use this list to send quick statements</p>
+        </div>
+      </div>
+      <div id="all-balances-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ AGED RECEIVABLES ═══════════════════════════════════════ -->
+<div class="panel" id="tab-credit">
+  <div id="cle" class="empty"><div class="ei">⚠️</div><p>Upload the Aging Accounts Receivable PDF and run CreditFlow</p></div>
+  <div id="clc" style="display:none">
+    
+    <div class="sgrid" id="cl-stats"></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-p" onclick="exportARXLSX()">⬇️ Export credit report (.xlsx)</button>
+      <button class="btn-sm" onclick="expandAllClass('cl-body')">▼ Expand all</button>
+      <button class="btn-sm" onclick="collapseAllClass('cl-body')">▲ Collapse all</button>
+      <input type="text" id="cl-filter" placeholder="Filter by name…" oninput="renderAgedReceivablesTab()" style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--rsm);padding:5px 10px;font-size:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;width:180px">
+    </div>
+    <div class="sort-bar">
+      <label>Sort:</label>
+      <select class="sort-sel" id="cl-sort" onchange="renderAgedReceivablesTab()">
+        <option value="util-desc">Highest % utilisation first</option>
+        <option value="util-asc">Lowest % utilisation first</option>
+        <option value="overdue-desc">Largest overdue first</option>
+        <option value="name-asc">A → Z</option>
+        <option value="name-desc">Z → A</option>
+      </select>
+    </div>
+    <div id="cl-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ MATCH REPORT ═══════════════════════════════════════ -->
+<div class="panel" id="tab-match">
+  <div id="me" class="empty"><div class="ei">🔀</div><p>Upload a Customer Statement PDF (and optionally a Remittance PDF) then run CreditFlow</p></div>
+  <div id="mc" style="display:none">
+    <div class="abox ai" style="margin-bottom:14px">ℹ️ Each table shows outstanding invoices per customer. <strong>Overdue</strong> = due date before today and not covered by remittance. <strong>Not yet due</strong> = due date in the future.</div>
+    <div id="mr-recon" style="display:none;margin-bottom:14px"></div>
+    <div class="sgrid" id="mr-stats"></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="exportMatchXLSX()">⬇️ Export match report (.xlsx)</button>
+      <button class="btn-sm" onclick="expandAllClass('mr-body')">▼ Expand all</button>
+      <button class="btn-sm" onclick="collapseAllClass('mr-body')">▲ Collapse all</button>
+    </div>
+    <div class="sort-bar">
+      <label>Sort:</label>
+      <select class="sort-sel" id="mr-sort" onchange="renderMatchReportTab()">
+        <option value="overdue-desc">Most overdue first</option>
+        <option value="name-asc">A → Z</option>
+        <option value="name-desc">Z → A</option>
+        <option value="amount-desc">Largest total first</option>
+      </select>
+    </div>
+    <div id="mr-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ BULK EMAILS ═══════════════════════════════════════ -->
+<div class="panel" id="tab-bulk">
+  <div id="be" class="empty"><div class="ei">📧</div><p>Run CreditFlow to see customers with outstanding balances</p></div>
+  <div id="bc" style="display:none">
+    
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <button class="btn-sm" onclick="copyBulkList()">⧉ Copy all names + balances</button>
+      <input type="text" id="bulk-filter" placeholder="Filter by name…" oninput="renderBulkEmailsTab()" style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--rsm);padding:5px 10px;font-size:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;width:180px">
+      <select class="sort-sel" id="bulk-sort" onchange="renderBulkEmailsTab()">
+        <option value="name-asc">A → Z</option>
+        <option value="name-desc">Z → A</option>
+        <option value="balance-desc">Largest balance first</option>
+        <option value="overdue-desc">Largest overdue first</option>
+      </select>
+    </div>
+    <div id="bulk-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ ENQUIRIES ═══════════════════════════════════════ -->
+<div class="panel" id="tab-enquiry">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <p class="sl" style="margin:0">Open Enquiries</p>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input type="text" id="enq-filter" placeholder="Filter by name…" oninput="renderEnquiries()" style="background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--rsm);padding:5px 10px;font-size:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;width:180px">
+      <button class="btn-sm" onclick="exportEnquiriesXLSX()">⬇️ Export (.xlsx)</button>
+      <button class="btn-sm" onclick="toggleEnqForm()">+ Log new enquiry</button>
+    </div>
+  </div>
+  <div class="eform" id="enq-form" style="display:none">
+    <p class="sl" style="margin-bottom:12px">New Enquiry</p>
+    <div class="fgrid">
+      <div class="fg"><label>Customer Name</label>
+    <div class="cust-input-wrap">
+      <input type="text" id="eq-cust" placeholder="Start typing to search…" autocomplete="off"
+        oninput="showCustDropdown('eq-cust','eq-cust-dd')" onblur="setTimeout(()=>hideCustDropdown('eq-cust-dd'),200)" onfocus="showCustDropdown('eq-cust','eq-cust-dd')"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rsm);padding:8px 11px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500">
+      <div class="cust-dropdown" id="eq-cust-dd"></div>
+    </div></div>
+      <div class="fg"><label>Invoice Number(s)</label><input type="text" id="eq-inv" placeholder="e.g. INV-1042"></div>
+      <div class="fg"><label>Amount in Query (£)</label><input type="text" id="eq-amt" placeholder="e.g. 3500.00"></div>
+      <div class="fg"><label>Priority</label>
+        <select id="eq-pri"><option value="high">🔴 High — urgent</option><option value="med" selected>🟡 Medium</option><option value="low">🟢 Low</option></select>
+      </div>
+      <div class="fg ff"><label>Enquiry / Dispute</label><textarea id="eq-issue" placeholder="Describe the dispute..."></textarea></div>
+      <div class="fg ff"><label>What did the customer say?</label><textarea id="eq-said" placeholder="Paste or summarise last response..."></textarea></div>
+      <div class="fg"><label>Last Communication Date</label><input type="text" id="eq-date" placeholder="e.g. 02/06/2025"></div>
+      <div class="fg"><label>Next Action</label><input type="text" id="eq-next" placeholder="e.g. Chase for POD by Friday"></div>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:8px">
+      <button class="btn btn-p" id="enq-save-btn" onclick="saveEnquiry()">💾 Save Enquiry</button>
+      <button class="btn btn-s" onclick="toggleEnqForm()">Cancel</button>
+    </div>
+  </div>
+  <div id="enq-list"></div>
+  <div id="enq-empty" class="empty" style="display:none"><div class="ei">💬</div><p>No open enquiries</p></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- REMITTANCE MODAL -->
+<div id="rem-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--surface);border-radius:var(--r);padding:22px;width:420px;max-width:92vw;box-shadow:var(--shm)">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px" id="rem-modal-title">Log Remittance Received</div>
+    <div class="fg" style="margin-bottom:9px"><label>Customer Name</label>
+    <div class="cust-input-wrap">
+      <input type="text" id="rm-cust" placeholder="Start typing to search…" autocomplete="off"
+        oninput="showCustDropdown('rm-cust','rm-cust-dd')" onblur="setTimeout(()=>hideCustDropdown('rm-cust-dd'),200)" onfocus="showCustDropdown('rm-cust','rm-cust-dd')"
+        style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rsm);padding:8px 11px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500">
+      <div class="cust-dropdown" id="rm-cust-dd"></div>
+    </div></div>
+    <div class="fg" style="margin-bottom:9px"><label>Invoice Numbers Covered</label><input type="text" id="rm-invs" placeholder="e.g. INV-001, INV-002 (or leave blank)"></div>
+    <div class="fg" style="margin-bottom:14px"><label>Amount Received (£)</label><input type="text" id="rm-amt" placeholder="e.g. 5000.00"></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn btn-p" onclick="saveRem()">Save</button>
+      <button class="btn btn-s" onclick="closeRemModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- REMITTANCE CHASE EMAIL MODAL -->
+<div class="edraft-overlay" id="rem-email-modal" style="display:none">
+  <div class="edraft-box">
+    <div class="edraft-hdr">
+      <div style="font-size:20px">📧</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px;color:var(--blue)">Remittance Chase Email</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">For <strong id="rem-email-cname"></strong> — <span id="rem-email-overdue" style="color:var(--red);font-weight:700"></span> overdue (excl. remittance)</div>
+      </div>
+      <button class="btn-sm" onclick="closeRemittanceEmailDraft()" style="flex-shrink:0">✕ Close</button>
+    </div>
+    <div class="edraft-body">
+      <div class="edraft-section">
+        <div class="edraft-section-label">Recipient Email</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="email" id="rem-email-to" placeholder="customer@example.com"
+            style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rsm);padding:8px 12px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500"
+            oninput="if(this.value.includes('@')){this.style.borderColor='var(--green-mid)';this.style.background='var(--green-bg)';}else{this.style.borderColor='';this.style.background='';}">
+          <span id="rem-email-contact-hint" style="font-size:11px;color:var(--text3);white-space:nowrap"></span>
+        </div>
+      </div>
+      <div class="edraft-section">
+        <div class="edraft-section-label">Email Preview</div>
+        <div id="rem-email-preview" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 20px;font-size:13px;line-height:1.9;color:var(--text)"></div>
+      </div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="copyRemittanceEmail()">⧉ Copy Email Text</button>
+        <button class="btn btn-p" onclick="createRemittanceGmailDraft()" style="background:linear-gradient(135deg,#1a4080,#1e4d8c)">📧 Create Gmail Draft</button>
+        <button class="btn btn-s" onclick="closeRemittanceEmailDraft()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL DRAFT MODAL -->
+<div class="edraft-overlay" id="edraft-modal">
+  <div class="edraft-box">
+    <div class="edraft-hdr">
+      <div style="font-size:20px">✉️</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:15px;color:var(--blue)">Draft Overdue Email</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">For <strong id="edraft-cname"></strong> — <span id="edraft-overdue" style="color:var(--red);font-weight:700"></span> overdue</div>
+      </div>
+      <button class="btn-sm" onclick="closeEmailDraft()" style="flex-shrink:0">✕ Close</button>
+    </div>
+    <div class="edraft-body">
+
+      <div class="edraft-section">
+        <div class="edraft-section-label">Step 1 — Upload Customer Statement (optional but recommended)</div>
+        <div class="uz" id="edraft-stmt-zone" style="min-height:90px;padding:14px" onclick="document.getElementById('edraft-stmt-input').click()">
+          <div class="uz-icon" id="edraft-stmt-icon" style="font-size:22px;margin-bottom:5px">📄</div>
+          <div class="uz-title" id="edraft-stmt-title" style="font-size:12px">Upload Customer Statement PDF</div>
+          <div class="uz-sub" id="edraft-stmt-sub">Click or drag — the invoice table will be inserted into the email</div>
+          <div id="edraft-stmt-file" style="font-size:11px;font-weight:600;margin-top:4px;color:var(--green)"></div>
+        </div>
+        <input type="file" id="edraft-stmt-input" accept=".pdf" onchange="handleEmailStmtUpload(this)">
+      </div>
+
+      <div class="edraft-section">
+        <div class="edraft-section-label">Step 2 — Recipient Email</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="email" id="edraft-to" placeholder="customer@example.com — auto-filled if found in Gmail"
+            style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rsm);padding:8px 12px;font-size:13px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;transition:border-color .15s"
+            oninput="if(this.value.includes('@')&&!/@newwayinternational/i.test(this.value)){this.style.borderColor='var(--green-mid)';this.style.background='var(--green-bg)';_saveContactFromDraft(_emailCustomer&&_emailCustomer.name||'',this.value);}else{this.style.borderColor='';this.style.background='';}">
+          <span id="edraft-contact-hint" style="font-size:11px;color:var(--text3);white-space:nowrap"></span>
+        </div>
+      </div>
+
+      <div class="edraft-section">
+        <div class="edraft-section-label">Step 3 — Email Draft</div>
+        <div id="edraft-email-display" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:18px 20px;font-size:13px;line-height:1.9;color:var(--text)">
+          <div id="edraft-part1" style="white-space:pre-wrap;font-family:'Plus Jakarta Sans',sans-serif"></div>
+          <div id="edraft-table-html" style="margin:8px 0"></div>
+          <div id="edraft-part2" style="white-space:pre-wrap;font-family:'Plus Jakarta Sans',sans-serif"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="copyEmailDraft()">⧉ Copy Email Text</button>
+        <button class="btn btn-p" onclick="createGmailDraft()" style="background:linear-gradient(135deg,#1a4080,#1e4d8c)" title="Create draft in Gmail (requires Gmail connection)">📧 Create Gmail Draft</button>
+        <button class="btn btn-s" onclick="closeEmailDraft()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+const S = {
+  saCustomers: [],   // Parsed from Summary Aging PDF
+  arCustomers: [],   // Parsed from Aged Receivables PDF
+  stmtInvoices: [],  // Parsed from Customer Statement PDF
+  remittances: [],   // Logged/parsed remittances
+  enquiries: [],
+  files: { sa: null, ar: null, stmt: null },
+  stmtFiles: [],
+  dismissedAlerts: new Set(),
+  saColLabels: { col4: 'Before', col5: 'Date Range 1', col6: 'Date Range 2' }
+};
+
+// Gmail state
+let _gmailToken = null;
+let _stmtBase64 = null;   // base64 of last uploaded customer statement
+let _stmtFileName = '';
+// Emailed-customer tracking (persisted in localStorage)
+let _emailedCustomers = new Set(JSON.parse(localStorage.getItem('nwi_emailed')||'[]'));
+
+document.getElementById('hdr-date').textContent = 'As at ' + TODAY.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────────────────────────────
+function toast(type, title, msg) {
+  const w = document.getElementById('tw');
+  const el = document.createElement('div');
+  const icons = {ok:'✅',warn:'⚠️',err:'❌'};
+  el.className = 'toast t'+type;
+  el.innerHTML = `<div class="t-icon">${icons[type]||'ℹ️'}</div><div><div class="t-title">${title}</div><div class="t-msg">${msg||''}</div></div>`;
+  w.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),280);},4000);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────────────────────────────────────
+function st(name) {
+  const names = ['upload','overdue','credit','match','bulk','enquiry'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active','tab-'+names[i]==='tab-'+name));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────────────────────────────────────────
+function fmt(n) { return '£'+Number(n||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function _getCurrSym(currency) {
+  var c = (currency||'GBP').toUpperCase().trim();
+  if (c==='GBP') return '£';
+  if (c==='EUR') return '€';
+  if (c==='USD') return '$';
+  if (c==='JPY') return '¥';
+  return c+' ';
+}
+function fmtC(n, currency) { return _getCurrSym(currency||'GBP')+Number(n||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtNum(n) { return Number(n||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function parseNum(s) {
+  if(!s && s !== 0) return 0;
+  const n = parseFloat(String(s).replace(/[£,\s]/g,'').replace(/\(([^)]+)\)/,'-$1'));
+  return isNaN(n) ? 0 : n;
+}
+function parseDate(s) {
+  if(!s) return null;
+  s = String(s).trim();
+  let m = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+  if(m) { const y=m[3].length===2?'20'+m[3]:m[3]; const d=new Date(y+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0')); if(!isNaN(d)) return d; }
+  m = s.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+  if(m) { const d=new Date(m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0')); if(!isNaN(d)) return d; }
+  const d = new Date(s); return isNaN(d) ? null : d;
+}
+function fmtDate(d) { if(!d||isNaN(d)) return '—'; return d.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function escH(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function isCredit(dt) { return /credit\s*(memo|note)/i.test(dt||''); }
+function toggleCard(bId,cId) {
+  const b=document.getElementById(bId), c=document.getElementById(cId);
+  if(b) b.classList.toggle('open');
+  if(c) c.className='chev'+(b&&b.classList.contains('open')?' open':'');
+}
+function expandAllClass(cls) { document.querySelectorAll('.'+cls).forEach(b=>b.classList.add('open')); }
+function collapseAllClass(cls) { document.querySelectorAll('.'+cls).forEach(b=>b.classList.remove('open')); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PDF EXTRACTION — POSITIONAL TEXT
+// ─────────────────────────────────────────────────────────────────────────────
+async function extractPDFRows(file, pageFilter) {
+  const ab = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: ab}).promise;
+  const allPageRows = [];
+
+  for (let pn = 1; pn <= pdf.numPages; pn++) {
+    if (pageFilter && !pageFilter(pn)) continue;
+    const page = await pdf.getPage(pn);
+    const tc = await page.getTextContent();
+
+    // Map to {t, x, y}
+    const items = tc.items
+      .map(it => ({t: it.str.trim(), x: it.transform[4], y: it.transform[5]}))
+      .filter(it => it.t.length > 0);
+
+    // Group by y with ±6 unit tolerance
+    const rowMap = new Map();
+    for (const item of items) {
+      let foundKey = null;
+      for (const [ky] of rowMap) {
+        if (Math.abs(ky - item.y) <= 6) { foundKey = ky; break; }
+      }
+      if (foundKey === null) { foundKey = item.y; rowMap.set(foundKey, []); }
+      rowMap.get(foundKey).push(item);
+    }
+
+    // Sort top-to-bottom, left-to-right within row
+    const rows = [...rowMap.entries()]
+      .sort((a, b) => b[0] - a[0])
+      .map(([y, its]) => ({
+        y,
+        cells: its.sort((a, b) => a.x - b.x).map(i => i.t)
+      }));
+
+    allPageRows.push({page: pn, rows});
+  }
+  return allPageRows;
+}
+
+// Extract flat ordered text from all pages (for remittance / simple parsing)
+async function extractFlatText(file) {
+  const ab = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: ab}).promise;
+  let text = '';
+  for (let i=1; i<=pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const tc = await page.getTextContent();
+    text += tc.items.map(it=>it.str).join(' ') + '\n';
+  }
+  return text;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXTRACT SUMMARY AGING COLUMN DATE LABELS
+// Scans header rows for actual date ranges (e.g. "Before 01/04/2025")
+// ─────────────────────────────────────────────────────────────────────────────
+function extractSAColLabels(allRows) {
+  const DATE_RE = /\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/;
+  const BEFORE_RE = /^before/i;
+  const RANGE_RE = /\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}\s*(?:[-\.]{2,}|to)\s*\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/i;
+
+  for (let ri = 0; ri < allRows.length; ri++) {
+    const cells = allRows[ri].cells;
+
+    // Look for a row containing a "Before" cell followed by date ranges
+    const beforeIdx = cells.findIndex(c => BEFORE_RE.test(c));
+    if (beforeIdx >= 0) {
+      // Gather meaningful labels from this row and the next few rows
+      const combined = [...cells];
+      for (let j = 1; j <= 3 && ri + j < allRows.length; j++) {
+        const next = allRows[ri + j].cells;
+        if (next.some(c => /^[A-Z]{1,8}\d{2,8}$/.test(c))) break;
+        combined.push(...next);
+      }
+
+      // Collect label tokens: "Before", date ranges, standalone dates
+      const labels = [];
+      for (let i = beforeIdx; i < combined.length; i++) {
+        const c = combined[i];
+        if (BEFORE_RE.test(c)) {
+          // Might be "Before" standalone or "Before 01/04/2025"
+          if (DATE_RE.test(c)) {
+            labels.push(c);
+          } else if (i + 1 < combined.length && DATE_RE.test(combined[i + 1])) {
+            labels.push(c + ' ' + combined[i + 1]);
+            i++;
+          } else {
+            labels.push('Before');
+          }
+        } else if (RANGE_RE.test(c) || DATE_RE.test(c)) {
+          labels.push(c);
+        }
+        if (labels.length >= 3) break;
+      }
+
+      if (labels.length >= 1) {
+        return {
+          col4: labels[0] || 'Before',
+          col5: labels[1] || 'Date Range 1',
+          col6: labels[2] || 'Date Range 2'
+        };
+      }
+    }
+
+    // Fallback: row with 3+ date range patterns in sequence
+    const dateTokens = cells.filter(c => DATE_RE.test(c));
+    if (dateTokens.length >= 3) {
+      return { col4: dateTokens[0], col5: dateTokens[1], col6: dateTokens[2] };
+    }
+  }
+
+  return { col4: 'Before', col5: 'Date Range 1', col6: 'Date Range 2' };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUMMARY AGING PDF PARSER
+// Columns: No. | Name | Currency | col4(Before) | col5(DateRange1) | col6(DateRange2) | col7(DateRange3) | col8(After) | Balance
+// Overdue = col4 + col5 + col6
+// ─────────────────────────────────────────────────────────────────────────────
+async function parseSummaryAgingPDF(file) {
+  const pages = await extractPDFRows(file, null);
+  const customers = [];
+  const ACCT = /^[A-Z]{1,8}\d{2,8}$/;
+  const CURR = /^(GBP|USD|EUR)$/;
+  const SKIP = /^(No\.|Total|Page|Customer|Summary|Balance|NEWWAY|HASLEEN|Aged|Before|After|Date|Balance Due)$/i;
+  const NUM = /^-?[\d,]+\.?\d*$/;
+
+  // Flatten all rows across pages
+  const allRows = pages.flatMap(p => p.rows);
+
+  // Extract actual column date labels from the header
+  S.saColLabels = extractSAColLabels(allRows);
+  try { localStorage.setItem('nwi_sa_col_labels', JSON.stringify(S.saColLabels)); } catch(e) {}
+
+  for (let ri = 0; ri < allRows.length; ri++) {
+    let cells = [...allRows[ri].cells];
+    const code = cells[0] || '';
+    if (!ACCT.test(code)) continue;
+    if (SKIP.test(code)) continue;
+
+    // Find currency — might be on same row or next row (long names wrap)
+    let currIdx = cells.findIndex(c => CURR.test(c));
+    let extraSkip = 0;
+
+    if (currIdx < 0) {
+      // Try merging with up to 3 following rows
+      for (let ahead = 1; ahead <= 3 && ri + ahead < allRows.length; ahead++) {
+        const nextCells = allRows[ri + ahead].cells;
+        // Stop if next row has a different account code
+        if (ACCT.test(nextCells[0]) && nextCells[0] !== code) break;
+        cells = cells.concat(nextCells);
+        currIdx = cells.findIndex(c => CURR.test(c));
+        if (currIdx >= 0) { extraSkip = ahead; break; }
+      }
+    }
+    if (currIdx < 0) continue;
+    ri += extraSkip;
+
+    const currency = cells[currIdx];
+    const name = cells.slice(1, currIdx).filter(c => !NUM.test(c)).join(' ').trim();
+    const afterCurr = cells.slice(currIdx + 1);
+
+    // Extract numbers — handle standalone '-' sign followed by number
+    const nums = [];
+    for (let i = 0; i < afterCurr.length; i++) {
+      let raw = afterCurr[i];
+      if (raw === '-' && i + 1 < afterCurr.length && NUM.test(afterCurr[i+1])) {
+        raw = '-' + afterCurr[i+1]; i++;
+      }
+      const cleaned = raw.replace(/,/g,'');
+      const n = parseFloat(cleaned);
+      if (!isNaN(n)) nums.push(n);
+    }
+
+    if (nums.length < 2) continue;
+
+    // SA always has 6 values: col4(before), col5, col6, col7(current), col8(after), balance
+    // Balance is always the last / rightmost value
+    const col4 = nums.length >= 1 ? nums[0] : 0;
+    const col5 = nums.length >= 2 ? nums[1] : 0;
+    const col6 = nums.length >= 3 ? nums[2] : 0;
+    const balance = nums[nums.length - 1];
+    const overdueAmount = col4 + col5 + col6;
+
+    customers.push({ code, name: name||code, currency, col4, col5, col6, balance, overdueAmount });
+  }
+  return customers;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AGED RECEIVABLES PDF PARSER (odd pages only)
+// Columns: No. | Name | Email | CreditLimit | PaymentTerms | Currency | Balance | NotDue | [overdue...]
+// Overdue = Balance - NotDue
+// ─────────────────────────────────────────────────────────────────────────────
+async function parseAgedReceivablesPDF(file) {
+  // Only odd pages have the main data (Balance, Not Due, Credit Limit, etc.)
+  const pages = await extractPDFRows(file, pn => pn % 2 === 1);
+  const customers = [];
+  const ACCT = /^[A-Z]{1,8}\d{2,8}$/;
+  const CURR = /^(GBP|USD|EUR)$/;
+  const TERMS = /^(ADV|\d+\s?DAYS?|1\s?DAY|\d+DAY)$/i;
+  const NUM = /^-?[\d,]+\.?\d*$/;
+  const SKIP = /^(No\.|Total|Page|Aged|Currency|NEWWAY|HASLEEN|Balance|Credit)$/i;
+
+  const allRows = pages.flatMap(p => p.rows);
+
+  for (let ri = 0; ri < allRows.length; ri++) {
+    let cells = [...allRows[ri].cells];
+    const code = cells[0] || '';
+    if (!ACCT.test(code)) continue;
+    if (SKIP.test(code)) continue;
+
+    // Collect cells, merging rows until we find currency (emails can wrap)
+    let currIdx = cells.findIndex(c => CURR.test(c));
+    let extraSkip = 0;
+
+    if (currIdx < 0) {
+      for (let ahead = 1; ahead <= 4 && ri + ahead < allRows.length; ahead++) {
+        const nextCells = allRows[ri + ahead].cells;
+        if (ACCT.test(nextCells[0]) && nextCells[0] !== code) break;
+        cells = cells.concat(nextCells);
+        currIdx = cells.findIndex(c => CURR.test(c));
+        if (currIdx >= 0) { extraSkip = ahead; break; }
+      }
+    }
+    if (currIdx < 0) continue;
+    ri += extraSkip;
+
+    const currency = cells[currIdx];
+    const beforeCurr = cells.slice(0, currIdx);
+    const afterCurr = cells.slice(currIdx + 1);
+
+    // Numbers after currency: [Balance, NotDue, overdue1, ...]
+    const nums = [];
+    for (let i = 0; i < afterCurr.length; i++) {
+      let raw = afterCurr[i];
+      if (raw === '-' && i + 1 < afterCurr.length && NUM.test(afterCurr[i+1])) {
+        raw = '-' + afterCurr[i+1]; i++;
+      }
+      const n = parseFloat(raw.replace(/,/g,''));
+      if (!isNaN(n)) nums.push(n);
+    }
+    if (nums.length < 2) continue;
+
+    const balance = nums[0];
+    const notDue = nums[1];
+    const overdue = balance - notDue;
+
+    // Find payment terms: last item before currency matching terms pattern
+    let termsIdx = -1;
+    for (let i = beforeCurr.length - 1; i >= 0; i--) {
+      if (TERMS.test(beforeCurr[i])) { termsIdx = i; break; }
+    }
+    const paymentTerms = termsIdx >= 0 ? beforeCurr[termsIdx].toUpperCase().replace(/(\d+)(DAYS?)$/i,'$1 $2').replace(/1 DAY/i,'1 DAY') : '';
+
+    // Credit limit: number right before payment terms
+    let creditLimit = 0;
+    if (termsIdx >= 1) {
+      for (let i = termsIdx - 1; i >= Math.max(0, termsIdx - 2); i--) {
+        const n = parseFloat(beforeCurr[i].replace(/,/g,''));
+        if (!isNaN(n) && n >= 0) { creditLimit = n; break; }
+      }
+    }
+
+    // Name: items between code and first email-like item (or before credit limit)
+    const emailIdx = beforeCurr.findIndex(c => c.includes('@'));
+    const nameEnd = emailIdx > 0 ? emailIdx : (termsIdx >= 1 ? termsIdx - 1 : termsIdx);
+    const name = beforeCurr.slice(1, Math.max(1, nameEnd)).filter(c => !c.includes('@')).join(' ').trim() || beforeCurr[1] || code;
+
+    const utilization = creditLimit > 0 ? (balance / creditLimit) * 100 : 0;
+
+    customers.push({
+      code, name, currency, creditLimit, paymentTerms,
+      balance, notDue, overdue, utilization
+    });
+  }
+  return customers;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CUSTOMER STATEMENT PDF PARSER
+// Extracts invoice rows: docNo, extDocNo, docType, dueDate, debit, credit
+// ─────────────────────────────────────────────────────────────────────────────
+async function parseCustomerStatementPDF(file) {
+  const pages = await extractPDFRows(file, null);
+  const invoices = [];
+  const allRows = pages.flatMap(p => p.rows);
+
+  // Invoice number = starts with 17 (pure numeric, first column)
+  const INV_NO_RE = /^17\d{2,12}$/;
+  // External doc number = starts with CP, PO, or 0... (fourth column)
+  const EXT_DOC_RE = /^(CP|PO)[A-Z0-9\-]*\d+$|^0\d{4,}$/i;
+  // Fallback for other invoice styles (letters then digits)
+  const DOC_FALLBACK_RE = /^[A-Z]{1,5}[_\-]?\d{4,10}$/;
+  const DATE_RE = /^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}$/;
+  const NUM_RE = /^-?[\d,]+\.\d{2}$/;
+
+  for (const row of allRows) {
+    const cells = row.cells;
+    if (cells.length < 4) continue;
+
+    // Find invoice number: prefer 17... pattern first, fallback to letter-prefix pattern
+    let invIdx = cells.findIndex(c => INV_NO_RE.test(c));
+    if (invIdx < 0) invIdx = cells.findIndex(c => DOC_FALLBACK_RE.test(c));
+    if (invIdx < 0) continue;
+
+    const docNo = cells[invIdx];
+
+    // Find all dates after invoice number; use the last one as due date
+    // (posting date comes before due date in statement columns)
+    const allDates = cells
+      .map((c, i) => ({c, i}))
+      .filter(({c, i}) => i > invIdx && DATE_RE.test(c));
+    if (!allDates.length) continue;
+    const dueDate = parseDate(allDates[allDates.length - 1].c);
+
+    // Find amounts
+    const amounts = cells.filter(c => NUM_RE.test(c)).map(c => parseFloat(c.replace(/,/g,'')));
+    if (!amounts.length) continue;
+
+    // Find external doc number: CP/PO/0... anywhere in the row (not same index as invoice)
+    let extDocNo = '';
+    const extIdx = cells.findIndex((c, i) => i !== invIdx && EXT_DOC_RE.test(c));
+    if (extIdx >= 0) {
+      extDocNo = cells[extIdx];
+    } else {
+      // Fallback: another doc-like token (not the invoice no itself)
+      const fb = cells.findIndex((c, i) => i !== invIdx && DOC_FALLBACK_RE.test(c));
+      if (fb >= 0) extDocNo = cells[fb];
+    }
+
+    // Document type
+    const docTypeIdx = cells.findIndex(c => /^(Invoice|Credit Memo|Payment|Reminder|Finance Charge)$/i.test(c));
+    const docType = docTypeIdx >= 0 ? cells[docTypeIdx] : 'Invoice';
+
+    // Use the outstanding amount = last numeric value in the row
+    // Statement columns: Debit | Credit | Outstanding (last)
+    // For invoices: outstanding is positive debit amount
+    // For credit memos: outstanding is negative (shown as - X.XX)
+    const positiveAmounts = amounts.filter(n => n > 0);
+    const negativeAmounts = amounts.filter(n => n < 0);
+    const debit = positiveAmounts[0] || 0;
+    const credit = negativeAmounts.length ? Math.abs(negativeAmounts[0]) : 0;
+    // Outstanding = last amount in the row (the rightmost column)
+    const rawAmounts = cells.filter(c => NUM_RE.test(c)).map(c => parseFloat(c.replace(/,/g,'')));
+    const outstanding = rawAmounts.length ? rawAmounts[rawAmounts.length - 1] : (debit - credit);
+    // For credit docs, the outstanding amount should be negative (reduces balance)
+    const amount = isCredit(docType) ? -Math.abs(outstanding) : outstanding;
+
+    const customerName = '';
+
+    invoices.push({ docNo, extDocNo, docType, dueDate, debit, credit, amount, customerName });
+  }
+  return invoices;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REMITTANCE PARSER (text-based)
+// ─────────────────────────────────────────────────────────────────────────────
+async function parseRemittanceText(file, filename) {
+  const text = await extractFlatText(file);
+  const lines = text.split(/\n/).map(l=>l.trim()).filter(Boolean);
+
+  let customerName = '';
+  for (let i = 0; i < Math.min(10, lines.length); i++) {
+    const l = lines[i];
+    if (l.length > 3 && l.length < 70 && !l.match(/^\d/) && !l.match(/remittance|advice|payment|invoice|ref|date|amount|total/i)) {
+      customerName = l; break;
+    }
+  }
+
+  // Capture invoice numbers: either letter-prefix (INV-1234) or pure numeric starting 17 (17219213)
+  const invPattern = /\b([A-Z]{1,5}[_\-]?\d{4,10}|17\d{5,10})\b/g;
+  const invoices = [];
+  let m;
+  while ((m = invPattern.exec(text)) !== null) {
+    const inv = m[1];
+    if (!invoices.includes(inv) && !inv.match(/^(PAGE|DATE|REF|TAX|VAT|LTD|PLC|GBP|USD|EUR)/i)) {
+      invoices.push(inv);
+    }
+  }
+
+  const amounts = [];
+  const amtRe = /(?:total|payment|amount|net|gross|paid|remittance)[:\s]+[£$]?\s*([\d,]+\.?\d{0,2})/gi;
+  while ((m = amtRe.exec(text)) !== null) { const a=parseFloat(m[1].replace(/,/g,'')); if(!isNaN(a)&&a>0) amounts.push(a); }
+  const allAmts = (text.match(/[£$]\s*([\d,]+\.\d{2})/g)||[]).map(a=>parseFloat(a.replace(/[£$,\s]/g,'')));
+  amounts.push(...allAmts.filter(a=>a>0));
+  const amount = amounts.length ? Math.max(...amounts) : 0;
+
+  if (!customerName && filename) {
+    customerName = filename.replace(/\.pdf$/i,'').replace(/[-_]/g,' ').replace(/remittance|advice|payment/gi,'').trim();
+  }
+
+  return { customerName, invoices, amount };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FILE UPLOAD HANDLERS
+// ─────────────────────────────────────────────────────────────────────────────
+async function handlePDFUpload(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    toast('err','Not a PDF','Please upload a PDF file');
+    input.value=''; return;
+  }
+  S.files[type] = file;
+  const icons = {sa:'📋',ar:'📊',stmt:'📄'};
+  const titles = {sa:'Summary Aging PDF',ar:'Aged Receivables PDF',stmt:'Customer Statement PDF'};
+  const zone = document.getElementById('z-'+type);
+  zone.className = 'uz ok';
+  document.getElementById('zi-'+type).textContent = '✅';
+  document.getElementById('zt-'+type).textContent = '✅ '+file.name;
+  document.getElementById('zf-'+type).textContent = `${(file.size/1024).toFixed(0)} KB · PDF`;
+  if (type === 'stmt') {
+    const custName = file.name.replace(/\.pdf$/i,'').replace(/customer.?statement.?/i,'').replace(/[-_]/g,' ').trim().toLowerCase();
+    if (custName) {
+      const before = S.remittances.length;
+      S.remittances = S.remittances.filter(r => {
+        const rn = r.customer.toLowerCase();
+        return !rn.includes(custName.split(' ')[0]) && !custName.includes(rn.split(' ')[0]);
+      });
+      if (S.remittances.length < before) {
+        saveRemittancesToStorage();
+        renderRemList();
+        toast('ok','Remittances cleared','New statement uploaded for customer');
+      }
+    }
+    // Store file as base64 for Gmail attachment
+    const reader = new FileReader();
+    reader.onload = e => { _stmtBase64 = e.target.result.split(',')[1]; _stmtFileName = file.name; };
+    reader.readAsDataURL(file);
+    // Track for multi-file list
+    if (!S.stmtFiles) S.stmtFiles = [];
+    if (!S.stmtFiles.includes(file.name)) S.stmtFiles.push(file.name);
+    try { localStorage.setItem('nwi_stmt_files', JSON.stringify(S.stmtFiles)); } catch(e) {}
+    setTimeout(renderStmtFileList, 100);
+  }
+
+  updateReadiness();
+  toast('ok', titles[type]+' attached', file.name);
+}
+
+function rmFile(type) {
+  S.files[type] = null;
+  if (type==='sa') { S.saCustomers=[]; try{localStorage.removeItem('nwi_sa_customers');}catch(e){} }
+  if (type==='ar') { S.arCustomers=[]; try{localStorage.removeItem('nwi_ar_customers');localStorage.removeItem('nwi_ar_col_labels');}catch(e){} }
+  if (type==='stmt') { S.stmtInvoices=[]; try{localStorage.removeItem('nwi_stmt_invoices');localStorage.removeItem('nwi_stmt_filename');}catch(e){} }
+  document.getElementById('in-'+type).value='';
+  const icons = {sa:'📋',ar:'📊',stmt:'📄'};
+  const subs = {sa:'Overdue by col 4+5+6 · Balance list',ar:'Credit limit · Overdue analysis',stmt:'Invoice details · Due dates'};
+  const zone = document.getElementById('z-'+type);
+  zone.className = 'uz';
+  document.getElementById('zi-'+type).textContent = icons[type];
+  document.getElementById('zt-'+type).textContent = {sa:'Customer Summary Aging PDF',ar:'Aged Accounts Receivable PDF',stmt:'Customer Statement PDF'}[type];
+  document.getElementById('zs-'+type).textContent = subs[type];
+  document.getElementById('zf-'+type).textContent = '';
+  updateReadiness();
+  toast('ok','File removed','Upload a new one when ready');
+}
+
+function updateReadiness() {
+  const sa=!!S.files.sa||S.saCustomers.length>0, ar=!!S.files.ar||S.arCustomers.length>0, stmt=!!S.files.stmt||S.stmtInvoices.length>0, rem=S.remittances.length>0;
+  const tick = ok => ok ? '✓ ' : '○ ';
+  const saLabel = S.saCustomers.length ? 'Summary Aging ('+S.saCustomers.length+')' : 'Summary Aging';
+  const arLabel = S.arCustomers.length ? 'Aged Receivables ('+S.arCustomers.length+')' : 'Aged Receivables';
+  const stmtLabel = S.stmtInvoices.length ? 'Statement ('+S.stmtInvoices.length+' inv)' : 'Statement';
+  document.getElementById('ri-sa').className='ri'+(sa?' ok':'');
+  document.getElementById('ri-sa').textContent=tick(sa)+saLabel;
+  document.getElementById('ri-ar').className='ri'+(ar?' ok':'');
+  document.getElementById('ri-ar').textContent=tick(ar)+arLabel;
+  document.getElementById('ri-stmt').className='ri'+(stmt?' ok':'');
+  document.getElementById('ri-stmt').textContent=tick(stmt)+stmtLabel;
+  document.getElementById('ri-rem').className='ri'+(rem?' ok':'');
+  document.getElementById('ri-rem').textContent=tick(rem)?`✓ ${S.remittances.length} logged`:'○ Remittances';
+  const ready = sa||ar||stmt||rem;
+  document.getElementById('rstatus').className='rstatus '+(ready?'ready':'notready');
+  document.getElementById('rstatus').textContent=ready?'🚀 Ready to run':'Upload at least one file to continue';
+  document.getElementById('run-btn').disabled=!ready;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REMITTANCES
+// ─────────────────────────────────────────────────────────────────────────────
+async function handleRemPDF(input) {
+  if(!input.files||!input.files.length) return;
+  const files = Array.from(input.files);
+  document.getElementById('rem-pdf-status').textContent = 'Reading '+files.length+' PDF(s)...';
+  for (const file of files) {
+    try {
+      const extracted = await parseRemittanceText(file, file.name);
+      document.getElementById('rm-cust').value = extracted.customerName||'';
+      document.getElementById('rm-invs').value = extracted.invoices.join(', ');
+      document.getElementById('rm-amt').value = extracted.amount>0?extracted.amount.toFixed(2):'';
+      document.getElementById('rem-modal-title').textContent = '📄 Confirm remittance: '+file.name;
+      document.getElementById('rem-modal').style.display='flex';
+      document.getElementById('rem-pdf-status').textContent='✅ PDF read — confirm details below';
+      toast('ok','Remittance PDF read','Check details and click Save');
+      break;
+    } catch(e) { toast('warn','Could not read PDF','Log manually instead'); showRemForm(); }
+  }
+  input.value='';
+}
+
+function showRemForm() { document.getElementById('rem-modal').style.display='flex'; }
+function closeRemModal() { document.getElementById('rem-modal').style.display='none'; }
+function saveRem() {
+  const cust=document.getElementById('rm-cust').value.trim();
+  if(!cust){toast('warn','Missing info','Enter customer name');return;}
+  const invs=document.getElementById('rm-invs').value.trim();
+  const amt=parseNum(document.getElementById('rm-amt').value);
+  S.remittances.push({customer:cust,invoices:invs.split(',').map(i=>i.trim()).filter(Boolean),amount:amt,loggedAt:new Date().toLocaleDateString('en-GB')});
+  renderRemList(); updateReadiness();
+  saveRemittancesToStorage();
+  ['rm-cust','rm-invs','rm-amt'].forEach(id=>document.getElementById(id).value='');
+  closeRemModal();
+  toast('ok','Remittance logged',cust+' — '+fmt(amt));
+}
+function rmRem(i){S.remittances.splice(i,1);renderRemList();updateReadiness();saveRemittancesToStorage();}
+function renderStmtFileList() {
+  const list = document.getElementById('stmt-file-list');
+  if (!list) return;
+  const files = S.stmtFiles || [];
+  if (!files.length) {
+    list.innerHTML = '';
+    const zone = document.getElementById('z-stmt');
+    if (zone) zone.className = 'uz';
+    document.getElementById('zi-stmt').textContent = '📄';
+    document.getElementById('zt-stmt').textContent = 'Customer Statement PDF';
+    document.getElementById('zs-stmt').textContent = 'Click to add · Multiple files supported';
+    return;
+  }
+  const zone = document.getElementById('z-stmt');
+  if (zone) zone.className = 'uz ok';
+  document.getElementById('zi-stmt').textContent = '✅';
+  document.getElementById('zt-stmt').textContent = files.length + ' statement' + (files.length>1?'s':'')+' loaded';
+  document.getElementById('zs-stmt').textContent = S.stmtInvoices.length + ' total invoices';
+  list.innerHTML = files.map((fname, fi) =>
+    `<div style="display:flex;align-items:center;gap:7px;background:var(--green-bg);border:1px solid var(--green-mid);border-radius:var(--rsm);padding:5px 10px;font-size:11px">
+      <span style="font-size:14px">📄</span>
+      <span style="flex:1;font-weight:500;color:var(--green-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(fname)}</span>
+      <span style="cursor:pointer;color:var(--text3);font-weight:700;padding:2px 4px;border-radius:4px;transition:color .15s" onclick="rmStmtFile(${fi})" title="Remove this file">✕</span>
+    </div>`
+  ).join('');
+}
+
+function rmStmtFile(fi) {
+  if (!S.stmtFiles) return;
+  S.stmtFiles.splice(fi, 1);
+  if (!S.stmtFiles.length) {
+    // Full clear
+    S.stmtInvoices = [];
+    S.stmtFiles = [];
+    S.files.stmt = null;
+    try { localStorage.removeItem('nwi_stmt_invoices'); localStorage.removeItem('nwi_stmt_filename'); localStorage.removeItem('nwi_stmt_files'); } catch(e) {}
+  } else {
+    // We can't re-parse removed file, so just update display and note user should re-run
+    try { localStorage.setItem('nwi_stmt_files', JSON.stringify(S.stmtFiles)); } catch(e) {}
+    toast('warn', 'File removed', 'Re-run CreditFlow to refresh match data');
+  }
+  renderStmtFileList();
+  updateReadiness();
+}
+
+function renderRemList(){
+  document.getElementById('rem-list').innerHTML=S.remittances.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--rsm);padding:7px 11px;font-size:12px">
+      <span style="flex:1;color:var(--amber);font-weight:500">📄 ${escH(r.customer)} — ${fmt(r.amount)}${r.invoices.length?' ('+escH(r.invoices.join(', '))+')':''}</span>
+      <span style="cursor:pointer;color:var(--amber);opacity:.7;font-size:15px" onclick="rmRem(${i})">✕</span>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────────────────────────────────────
+function setP(pct, msg) {
+  document.getElementById('prog').style.display='block';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('pstatus').textContent=msg;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN: RUN CREDITFLOW
+// ─────────────────────────────────────────────────────────────────────────────
+async function runCreditFlow() {
+  const btn = document.getElementById('run-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Processing...';
+  setP(5,'Starting...');
+  try {
+    if (S.files.sa) {
+      setP(20,'Parsing Summary Aging PDF...');
+      S.saCustomers = await parseSummaryAgingPDF(S.files.sa);
+      toast('ok','Summary Aging parsed', S.saCustomers.length+' customer rows found');
+      try { localStorage.setItem('nwi_sa_customers', JSON.stringify(S.saCustomers)); } catch(e) {}
+    }
+    if (S.files.ar) {
+      setP(50,'Parsing Aged Receivables PDF...');
+      S.arCustomers = await parseAgedReceivablesPDF(S.files.ar);
+      toast('ok','Aged Receivables parsed', S.arCustomers.length+' customer rows found');
+      try { localStorage.setItem('nwi_ar_customers', JSON.stringify(S.arCustomers)); } catch(e) {}
+    }
+    // Parse all uploaded statement PDFs (supports multiple)
+    const stmtFilesToParse = [];
+    if (S.files.stmt) stmtFilesToParse.push(S.files.stmt);
+    // Also include any additional files stored in stmtFiles but not yet parsed
+    if (stmtFilesToParse.length > 0) {
+      setP(75,'Parsing Customer Statement PDF(s)...');
+      const allInvoices = [];
+      const allDocNos = new Set();
+      for (const sf of stmtFilesToParse) {
+        const invs = await parseCustomerStatementPDF(sf);
+        invs.forEach(inv => { if (!allDocNos.has(inv.docNo)) { allDocNos.add(inv.docNo); allInvoices.push(inv); } });
+      }
+      S.stmtInvoices = allInvoices;
+      const fnameStr = stmtFilesToParse.map(f=>f.name).join(', ');
+      saveStmtToStorage(S.stmtInvoices, fnameStr);
+      if (!S.stmtFiles) S.stmtFiles = [];
+      stmtFilesToParse.forEach(f => { if (!S.stmtFiles.includes(f.name)) S.stmtFiles.push(f.name); });
+      try { localStorage.setItem('nwi_stmt_files', JSON.stringify(S.stmtFiles)); } catch(e) {}
+      toast('ok','Statement parsed', S.stmtInvoices.length+' invoice rows found');
+    }
+    setP(90,'Rendering reports...');
+    renderAll();
+    setP(100,'Complete!');
+    setTimeout(()=>{
+      document.getElementById('prog').style.display='none';
+      const total=S.saCustomers.length+S.arCustomers.length;
+      document.getElementById('pstatus').textContent=`✓ ${total} records processed`;
+      const hs=document.getElementById('hdr-status');
+      hs.textContent=`✓ ${total} records`;
+      hs.style.display='block';
+
+      // Navigate to best tab
+      if(S.saCustomers.length||S.arCustomers.length) st('overdue');
+      else if(S.stmtInvoices.length) st('match');
+    },400);
+  } catch(e) {
+    
+    document.getElementById('pstatus').textContent='❌ Error: '+e.message;
+    document.getElementById('prog').style.display='none';
+    toast('err','Processing failed',e.message);
+  }
+  btn.disabled=false; btn.innerHTML='⚡ Run CreditFlow';
+  updateReadiness();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AR NAME + CODE LOOKUP
+// Returns {code, name} from AR for a given SA customer (or falls back to SA)
+// ─────────────────────────────────────────────────────────────────────────────
+function _buildARLookup() {
+  const byCode = {}, byName = {};
+  S.arCustomers.forEach(c => {
+    byCode[c.code.toLowerCase()] = c;
+    byName[c.name.toLowerCase().trim()] = c;
+    // Also index by first meaningful word (3+ chars) for fuzzy match
+    const words = c.name.toLowerCase().split(/\s+/).filter(w=>w.length>=4);
+    words.forEach(w => { if(!byName[w]) byName[w] = c; });
+  });
+  return {byCode, byName};
+}
+
+function _arEnrich(c) {
+  // c is an SA customer or similar. Try to find matching AR entry.
+  if (!S.arCustomers.length) return {code: c.code||'', name: c.name};
+  const {byCode, byName} = _buildARLookup();
+  // 1. Match by code
+  if (c.code && byCode[c.code.toLowerCase()]) {
+    const ar = byCode[c.code.toLowerCase()];
+    return {code: ar.code, name: ar.name};
+  }
+  // 2. Match by exact name
+  const nameLow = c.name.toLowerCase().trim();
+  if (byName[nameLow]) return {code: byName[nameLow].code, name: byName[nameLow].name};
+  // 3. Match by first word
+  const firstWord = nameLow.split(/\s+/).find(w=>w.length>=4);
+  if (firstWord && byName[firstWord]) return {code: byName[firstWord].code, name: byName[firstWord].name};
+  // 4. Partial match
+  const arMatch = S.arCustomers.find(a => 
+    a.name.toLowerCase().includes(nameLow.split(' ')[0]) ||
+    nameLow.includes(a.name.toLowerCase().split(' ')[0])
+  );
+  if (arMatch) return {code: arMatch.code, name: arMatch.name};
+  // Fallback: use SA data
+  return {code: c.code||'', name: c.name};
+}
+
+function renderAll() {
+  renderAlerts();
+  renderSummaryAgingTab();
+  renderAgedReceivablesTab();
+  renderMatchReportTab();
+  renderBulkEmailsTab();
+  updateTabBadges();
+}
+
+function updateTabBadges() {
+  // Combined overdue: SA + AR customers not in SA
+  const saNameSet = new Set(S.saCustomers.map(c=>c.name.toLowerCase().trim()));
+  const arOnlyCount = S.arCustomers.filter(c=>c.overdue>0&&!saNameSet.has(c.name.toLowerCase().trim())).length;
+  const arByName2 = {};
+  S.arCustomers.forEach(c=>{arByName2[c.name.toLowerCase().trim()]=c;});
+  const saOD = S.saCustomers.filter(c=>{
+    let od = c.overdueAmount;
+    if(od===0){const m=arByName2[c.name.toLowerCase().trim()];if(m&&m.overdue>0)od=m.overdue;}
+    return od>0;
+  }).length;
+  const od = saOD + arOnlyCount;
+  const cl = S.arCustomers.filter(c=>c.creditLimit>0&&c.utilization>=90).length;
+  // Match report badge: count overdue invoices from stmt (excluding remitted + credit docs)
+  const remNums = new Set(); S.remittances.forEach(r=>r.invoices.forEach(i=>{if(i)remNums.add(i.trim().toLowerCase());}));
+  const mrOD = S.stmtInvoices.filter(inv=>!isCredit(inv.docType)&&!remNums.has((inv.docNo||'').toLowerCase())&&inv.dueDate&&inv.dueDate<TODAY&&inv.amount>0).length;
+  document.getElementById('t-overdue').innerHTML=`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Summary Aging${od>0?` <span class="tb">${od}</span>`:''}`;
+  document.getElementById('t-credit').innerHTML=`<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Aged Receivables${cl>0?` <span class="tb">${cl}</span>`:''}`;
+  document.getElementById('t-match').innerHTML=`<svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>Match Report${mrOD>0?` <span class="tb">${mrOD}</span>`:''}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ALERTS BAR (credit limit breaches from AR)
+// ─────────────────────────────────────────────────────────────────────────────
+function dismissAlert(key) { S.dismissedAlerts.add(key); renderAlerts(); }
+
+function renderAlerts() {
+  const overLimit = S.arCustomers.filter(c=>c.creditLimit>0&&c.balance>c.creditLimit);
+  document.getElementById('alerts-bar').innerHTML=overLimit.map((c,i)=>{
+    const key = c.code||c.name;
+    if (S.dismissedAlerts.has(key)) return '';
+    const over=c.balance-c.creditLimit;
+    return`<div class="top-alert">⚠️ <strong>${escH(c.name)}</strong>${c.code?` <span style="display:inline-flex;align-items:center;background:rgba(255,255,255,.2);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px;font-family:'DM Mono',monospace;margin-left:3px">${escH(c.code)}</span>`:''} — over credit limit by ${fmt(over)} &nbsp;·&nbsp; Balance ${fmtC(c.balance, c.currency)} / Limit ${fmt(c.creditLimit)}&nbsp;·&nbsp; ${c.paymentTerms}<div class="ta-right"><button style="cursor:pointer;padding:4px 10px;font-size:11px;border-radius:6px;background:var(--red);color:#fff;border:none;font-weight:600" onclick="st('credit')">View →</button><button class="alert-x" onclick="dismissAlert(${JSON.stringify(key).replace(/&/g,'&amp;').replace(/"/g,'&quot;')})" title="Dismiss">✕</button></div></div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SUMMARY AGING TAB
+// Overdue customers (col4+col5+col6 > 0) sorted largest to smallest
+// Plus: all customers with balance > 0
+// ─────────────────────────────────────────────────────────────────────────────
+function _buildSAStmtInvoices(c) {
+  if (!S.stmtInvoices.length) return '';
+  // Only show for the customer whose remittance matches this SA card
+  var cLow = c.name.toLowerCase();
+  var arObj = (window._arByName||{})[cLow] || null;
+  var arN = arObj ? arObj.name.toLowerCase() : cLow;
+  var matchRem = S.remittances.find(function(r) {
+    var rn = r.customer.toLowerCase();
+    var rnW = rn.split(/\s+/).find(function(w){return w.length>3;})||rn.split(' ')[0];
+    var cnW = cLow.split(/\s+/).find(function(w){return w.length>3;})||cLow.split(' ')[0];
+    var anW = arN.split(/\s+/).find(function(w){return w.length>3;})||arN.split(' ')[0];
+    return rn.includes(cnW)||cLow.includes(rnW)||rn.includes(anW)||arN.includes(rnW);
+  });
+  if (!matchRem) return '';
+  var remNums = new Set();
+  S.remittances.forEach(function(r){r.invoices.forEach(function(i){if(i)remNums.add(i.trim().toLowerCase());});});
+  var enqNums = new Set();
+  S.enquiries.forEach(function(e){(e.invoices||'').split(/[,;\s]+/).forEach(function(i){var t=i.trim();if(t)enqNums.add(t.toLowerCase());});});
+  var rows = S.stmtInvoices.map(function(inv) {
+    var creditDoc = isCredit(inv.docType);
+    var key = (inv.docNo||'').toLowerCase();
+    var extKey = (inv.extDocNo||'').toLowerCase();
+    var remitted = (key&&remNums.has(key))||(extKey&&remNums.has(extKey));
+    var overdue = !creditDoc&&!remitted&&inv.dueDate&&inv.dueDate<TODAY&&inv.amount>0;
+    var underQuery = !remitted&&enqNums.has(key);
+    var disputed = isDisputed(key);
+    var rowBg = '', statusTxt = '';
+    if (remitted) { rowBg='background:#f0faf4'; statusTxt='<span style="color:var(--green);font-weight:700">✅ Remitted</span>'; }
+    else if (disputed) { rowBg='background:#fffbeb'; statusTxt='<span style="color:var(--amber);font-weight:700">🚩 Disputed</span>'; }
+    else if (overdue) { rowBg='background:#fef2f2'; statusTxt='<span style="color:var(--red);font-weight:700">⚠ Overdue</span>'; }
+    else if (underQuery) { rowBg='background:#fef6e8'; statusTxt='<span style="color:var(--amber);font-weight:700">🟡 Under Query</span>'; }
+    else { statusTxt='<span style="color:var(--text3)">Not due</span>'; }
+    var sym = _getCurrSym(c.currency||'GBP');
+    return '<tr style="'+rowBg+'">'
+      +'<td style="font-family:monospace;font-weight:600;font-size:12px">'+escH(inv.docNo||'—')+'</td>'
+      +'<td style="font-size:12px;color:var(--text3)">'+escH(inv.extDocNo||'—')+'</td>'
+      +'<td style="font-size:12px">'+escH(inv.docType||'Invoice')+'</td>'
+      +'<td style="font-size:12px;color:'+(overdue?'var(--red)':'var(--text)')+';font-weight:'+(overdue?700:400)+'">'+fmtDate(inv.dueDate)+'</td>'
+      +'<td style="font-size:12px;font-weight:600;text-align:right;color:'+(overdue?'var(--red)':creditDoc?'var(--blue)':'var(--text)')+'">'+sym+(Math.abs(inv.amount)).toFixed(2)+'</td>'
+      +'<td>'+statusTxt+'</td>'
+      +'</tr>';
+  }).join('');
+  return '<div style="border-top:1px solid var(--border)">'
+    +'<div style="padding:8px 16px;background:var(--surface3);font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Statement Invoices — 🟢 Remitted &nbsp;🔴 Overdue &nbsp;🟡 Under Query</div>'
+    +'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Invoice No.</th><th>Ext. Doc No.</th><th>Doc Type</th><th>Due Date</th><th>Amount</th><th>Status</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table></div></div>';
+}
+
+function renderSummaryAgingTab() {
+  if (!S.saCustomers.length && !S.arCustomers.length) {
+    document.getElementById('ode').style.display='block';
+    document.getElementById('odc').style.display='none';
+    return;
+  }
+  document.getElementById('ode').style.display='none';
+  document.getElementById('odc').style.display='block';
+
+  // Build combined overdue list: SA customers + AR customers not already in SA
+  const saNameSet = new Set(S.saCustomers.map(c=>c.name.toLowerCase().trim()));
+  // AR customers with overdue that aren't already in SA
+  const arOnlyOverdue = S.arCustomers
+    .filter(c => c.overdue > 0 && !saNameSet.has(c.name.toLowerCase().trim()))
+    .map(c => ({
+      code: c.code, name: c.name, currency: c.currency,
+      col4: c.overdue, col5: 0, col6: 0,
+      balance: c.balance, overdueAmount: c.overdue,
+      fromAR: true
+    }));
+
+  // SA customers: enrich overdue with AR overdue if SA shows 0 but AR shows overdue
+  const arByName = {};
+  S.arCustomers.forEach(c => { arByName[c.name.toLowerCase().trim()] = c; });
+
+  const saEnriched = S.saCustomers.map(c => {
+    const arMatch = arByName[c.name.toLowerCase().trim()];
+    let overdueAmount = c.overdueAmount;
+    if (overdueAmount === 0 && arMatch && arMatch.overdue > 0) {
+      overdueAmount = arMatch.overdue;
+    }
+    // Deduct remitted invoice amounts for THIS specific customer only
+    // Match remittances to customer by name
+    if (S.stmtInvoices.length && S.remittances.length) {
+      const cNameLow = c.name.toLowerCase();
+      const arNameLow = (arMatch ? arMatch.name : c.name).toLowerCase();
+      // Find remittances belonging to this customer
+      const custRems = S.remittances.filter(r => {
+        const rn = r.customer.toLowerCase();
+        const rnWord = rn.split(/\s+/).find(w=>w.length>3)||rn.split(' ')[0];
+        const cnWord = cNameLow.split(/\s+/).find(w=>w.length>3)||cNameLow.split(' ')[0];
+        const anWord = arNameLow.split(/\s+/).find(w=>w.length>3)||arNameLow.split(' ')[0];
+        return rn.includes(cnWord)||cNameLow.includes(rnWord)||rn.includes(anWord)||arNameLow.includes(rnWord);
+      });
+      if (custRems.length) {
+        // Build invoice set covered by THIS customer's remittances only
+        const custRemInvs = new Set();
+        custRems.forEach(r => r.invoices.forEach(i => { if(i) custRemInvs.add(i.trim().toLowerCase()); }));
+        // Sum remitted invoice amounts from statement
+        const remittedForCust = S.stmtInvoices
+          .filter(inv => {
+            const key = (inv.docNo||'').toLowerCase();
+            const extKey = (inv.extDocNo||'').toLowerCase();
+            return (custRemInvs.has(key)||custRemInvs.has(extKey)) && inv.amount > 0;
+          })
+          .reduce((s,inv) => s + inv.amount, 0);
+        if (remittedForCust > 0) {
+          overdueAmount = Math.max(0, overdueAmount - remittedForCust);
+        }
+      }
+    }
+    return {...c, overdueAmount, fromAR: overdueAmount !== c.overdueAmount};
+  });
+
+  const allOverdue = [
+    ...saEnriched.filter(c=>c.overdueAmount>0),
+    ...arOnlyOverdue
+  ];
+
+  const odFilterVal = (document.getElementById('od-filter')||{}).value||'';
+  const filteredOverdue = odFilterVal.trim()
+    ? allOverdue.filter(c=>c.name.toLowerCase().includes(odFilterVal.trim().toLowerCase()))
+    : allOverdue;
+  const sortVal = (document.getElementById('od-sort')||{}).value || 'overdue-desc';
+  const sorted = [...filteredOverdue].sort((a,b)=>{
+    if(sortVal==='overdue-asc') return a.overdueAmount-b.overdueAmount;
+    if(sortVal==='name-asc') return a.name.localeCompare(b.name);
+    if(sortVal==='name-desc') return b.name.localeCompare(a.name);
+    if(sortVal==='balance-desc') return b.balance-a.balance;
+    return b.overdueAmount-a.overdueAmount; // overdue-desc default
+  });
+
+  window._odSorted = sorted; // expose for email draft lookup
+
+  const totalOD = sorted.reduce((s,c)=>s+c.overdueAmount,0);
+  const allBal = S.saCustomers.filter(c=>c.balance>0);
+
+  document.getElementById('od-stats').innerHTML=`
+    <div class="sc red"><div class="sc-l">Overdue Customers</div><div class="sc-v r">${sorted.length}</div></div>
+    <div class="sc red"><div class="sc-l">Total Overdue (All)</div><div class="sc-v r">${fmt(totalOD)}</div></div>
+    <div class="sc amber"><div class="sc-l">Top Overdue</div><div class="sc-v a" style="font-size:14px">${sorted[0]?fmt(sorted[0].overdueAmount):'—'}</div></div>
+    <div class="sc"><div class="sc-l">Customers w/ Balance</div><div class="sc-v">${allBal.length}</div></div>`;
+
+  // Compute risk score per customer: 0-100
+  function _riskScore(c) {
+    let score = 0;
+    // Amount overdue (0-40)
+    if (c.overdueAmount >= 50000) score += 40;
+    else if (c.overdueAmount >= 20000) score += 30;
+    else if (c.overdueAmount >= 10000) score += 20;
+    else if (c.overdueAmount >= 5000) score += 12;
+    else if (c.overdueAmount >= 1000) score += 6;
+    // Oldest bucket — col4 is "Before" (most overdue) (0-30)
+    if (c.col4 > 10000) score += 30;
+    else if (c.col4 > 5000) score += 22;
+    else if (c.col4 > 1000) score += 15;
+    else if (c.col4 > 0) score += 8;
+    // Over credit limit (0-20)
+    const arMatch = (window._arByName||{})[c.name.toLowerCase().trim()];
+    if (arMatch && arMatch.creditLimit > 0 && arMatch.balance > arMatch.creditLimit) score += 20;
+
+    return Math.min(score, 100);
+  }
+
+  // Colour rules: < £100 = green (write-off), £100-10k = amber, > £10k = red
+  document.getElementById('od-list').innerHTML = sorted.length ? sorted.map((c,ci)=>{
+    const isWriteOff = c.overdueAmount < 100;
+    const severity = isWriteOff ? 'green' : c.overdueAmount > 10000 ? 'red' : 'amber';
+    const sColor = {red:'var(--red)',amber:'var(--amber)',green:'var(--green)'}[severity];
+    const sourceTag = c.fromAR ? '<span class="badge bb" style="font-size:9px;margin-left:4px">AR</span>' : '';
+    return`<div class="card">
+      <div class="ch" onclick="toggleCard('od-bd-${ci}','od-chev-${ci}')">
+        <span style="font-size:15px">${severity==='red'?'🔴':severity==='amber'?'🟡':'🟢'}</span>
+        ${(()=>{const ar=_arEnrich(c);return `<span class="cname">${escH(ar.name)}</span>${ar.code?`<span style="display:inline-flex;align-items:center;background:#0f2d4a;color:#ffffff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;font-family:'DM Mono',monospace;margin-left:5px;letter-spacing:.03em">${escH(ar.code)}</span>`:''}`+sourceTag;})()}
+        <span class="badge bgr" style="font-size:10px">${c.currency}</span>
+        ${isWriteOff?'<span class="badge bg" style="font-size:9px;margin-left:4px">Likely write-off</span>':''}
+        <span style="font-size:13px;font-weight:700;color:${sColor};margin-left:8px">${fmtC(c.overdueAmount, c.currency)}</span>
+        ${(()=>{const rs=_riskScore(c);const rc=rs>=75?'var(--red)':rs>=45?'var(--amber)':'var(--green)';const rl=rs>=75?'HIGH':rs>=45?'MED':'LOW';return `<span title="Risk score ${rs}/100" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:${rc}1a;color:${rc};border:1px solid ${rc}4d;margin-left:4px">⚡ ${rl} RISK</span>`;})()}
+        <button class="btn-email" onclick="event.stopPropagation();openEmailDraft(${ci})" title="Draft overdue email for ${escH(c.name)}">✉️ Draft Email</button>
+        <span class="chev" id="od-chev-${ci}">▾</span>
+      </div>
+      <div class="cb od-body" id="od-bd-${ci}">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-bottom:1px solid var(--border)">
+          <div style="padding:12px 14px;background:${c.col4>0?'var(--red-bg)':'var(--surface3)'};border-right:1px solid var(--border)">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${escH(S.saColLabels.col4)}</div>
+            <div style="font-weight:${c.col4!==0?'700':'400'};font-size:14px;color:${c.col4>0?'var(--red)':c.col4<0?'var(--blue)':'var(--text3)'}">${c.col4!==0?fmtC(c.col4,c.currency):'—'}</div>
+          </div>
+          <div style="padding:12px 14px;background:${c.col5>0?'var(--red-bg)':'var(--surface3)'};border-right:1px solid var(--border)">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${escH(S.saColLabels.col5)}</div>
+            <div style="font-weight:${c.col5!==0?'700':'400'};font-size:14px;color:${c.col5>0?'var(--red)':c.col5<0?'var(--blue)':'var(--text3)'}">${c.col5!==0?fmtC(c.col5,c.currency):'—'}</div>
+          </div>
+          <div style="padding:12px 14px;background:${c.col6>0?'var(--red-bg)':'var(--surface3)'};border-right:1px solid var(--border)">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${escH(S.saColLabels.col6)}</div>
+            <div style="font-weight:${c.col6!==0?'700':'400'};font-size:14px;color:${c.col6>0?'var(--red)':c.col6<0?'var(--blue)':'var(--text3)'}">${c.col6!==0?fmtC(c.col6,c.currency):'—'}</div>
+          </div>
+          <div style="padding:12px 14px;background:${c.overdueAmount>0?'var(--red-bg)':'var(--surface3)'};border-right:1px solid var(--border)">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Total Overdue</div>
+            <div style="font-weight:700;font-size:14px;color:${c.overdueAmount>0?'var(--red)':'var(--text3)'}">${c.overdueAmount!==0?fmt(c.overdueAmount):'—'}</div>
+          </div>
+          <div style="padding:12px 14px;background:var(--surface3)">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Balance on Account</div>
+            <div style="font-weight:700;font-size:14px;color:var(--text)">${c.balance!==0?fmtC(c.balance,c.currency):'—'}</div>
+          </div>
+        </div>
+        <div style="padding:10px 16px;background:var(--surface3);display:flex;gap:16px;font-size:12px;flex-wrap:wrap">
+          <div><span style="color:var(--text3);font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.05em">Currency</span>&nbsp;&nbsp;<strong>${c.currency}</strong></div>
+          ${c.fromAR?'<div style="color:var(--blue);font-weight:600;font-size:11px">📊 Overdue from Aged Receivables (SA cols show 0)</div>':''}
+          ${isWriteOff?'<div style="color:var(--green);font-weight:600;font-size:11px">✅ Under £100 — likely write-off</div>':''}
+        </div>
+        <div style="padding:10px 16px;background:var(--surface2);border-top:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn-sm" onclick="logEnqFromName('${escH(c.name).replace(/'/g,"\\'")}')">💬 Log enquiry</button>
+          ${(()=>{
+            const custRems = S.remittances.filter(r => {
+              const rn = r.customer.toLowerCase(), cn = c.name.toLowerCase();
+              // Use first significant word (>3 chars) to avoid matching "The", "Ltd" etc
+              const cnWord = cn.split(' ').find(w=>w.length>3) || cn.split(' ')[0];
+              const rnWord = rn.split(' ').find(w=>w.length>3) || rn.split(' ')[0];
+              return rn.includes(cnWord) || cn.includes(rnWord) || rn.includes(cn.split(' ')[0]) || cn.includes(rn.split(' ')[0]);
+            });
+            if (!custRems.length) return '';
+            return custRems.map((r,ri)=>{
+              const globalIdx = S.remittances.indexOf(r);
+              return `<div style="display:flex;align-items:center;gap:7px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--rsm);padding:4px 9px;font-size:11px;font-weight:500;color:var(--amber)">📄 Remittance logged: ${fmt(r.amount)} on ${r.loggedAt||'—'}<span style="cursor:pointer;opacity:.7" onclick="rmRem(${globalIdx});renderSummaryAgingTab();">✕</span></div>`;
+            }).join('');
+          })()}
+        </div>
+        ${_buildSAStmtInvoices(c)}
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty"><div class="ei">✅</div><p>No overdue balances found</p></div>';
+
+  // All balances table
+  const allBalSorted = [...allBal].sort((a,b)=>b.balance-a.balance);
+  document.getElementById('all-balances-list').innerHTML = allBalSorted.length ? `
+    <table class="tbl">
+      <thead><tr><th>Customer Name</th><th>Currency</th><th>Balance on Account</th><th>Overdue Amount</th><th>Invoices Under Query</th></tr></thead>
+      <tbody>${allBalSorted.map(c=>{
+        const custEnqs = S.enquiries.filter(e =>
+          e.customer.toLowerCase().includes(c.name.toLowerCase().split(' ')[0]) ||
+          c.name.toLowerCase().includes(e.customer.toLowerCase().split(' ')[0])
+        );
+        const enqInvs = custEnqs.map(e=>e.invoices).filter(Boolean).join('; ');
+        const enqBadge = custEnqs.length
+          ? `<span class="badge ba" style="font-size:10px" title="${escH(enqInvs||'Enquiry logged')}">⚠️ ${custEnqs.length} enquir${custEnqs.length===1?'y':'ies'}</span>`
+          : '<span style="color:var(--text3);font-size:11px">—</span>';
+        return`<tr>
+          <td><div style="font-weight:600;font-size:13px">${(()=>{const ar=_arEnrich(c);return escH(ar.name);})()}</div>${(()=>{const ar=_arEnrich(c);return ar.code?`<span style="display:inline-flex;align-items:center;background:#0f2d4a;color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:5px;font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.04em">${escH(ar.code)}</span>`:'';})()} </td>
+          <td><span class="badge bgr">${c.currency}</span></td>
+          <td style="font-weight:700">${fmtC(c.balance, c.currency)}</td>
+          <td style="color:${c.overdueAmount>0?'var(--red)':c.overdueAmount<0?'var(--blue)':'var(--text3)'};font-weight:${c.overdueAmount!==0?'700':'400'}">${c.overdueAmount!==0?fmt(c.overdueAmount):'—'}</td>
+          <td>${enqBadge}</td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table>` : '<div class="empty"><div class="ei">✅</div><p>No customers with positive balances</p></div>';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AGED RECEIVABLES TAB
+// Shows credit limit analysis: name, credit limit, % used, overdue amount, payment terms
+// Flags: ≥90% utilisation or over limit
+// ─────────────────────────────────────────────────────────────────────────────
+function renderAgedReceivablesTab() {
+  // Expose for risk scoring
+  window._arByName = {};
+  S.arCustomers.forEach(c => { window._arByName[c.name.toLowerCase().trim()] = c; });
+
+  if (!S.arCustomers.length) {
+    document.getElementById('cle').style.display='block';
+    document.getElementById('clc').style.display='none';
+    return;
+  }
+  document.getElementById('cle').style.display='none';
+  document.getElementById('clc').style.display='block';
+
+  // Only customers with a credit limit (creditLimit > 0)
+  const withLimit = S.arCustomers.filter(c=>c.creditLimit>0);
+  const overLimit = withLimit.filter(c=>c.balance>c.creditLimit);
+  const nearLimit = withLimit.filter(c=>c.balance<=c.creditLimit&&c.utilization>=90);
+  const watchList = withLimit.filter(c=>c.utilization>=70&&c.utilization<90);
+  const allWithOverdue = S.arCustomers.filter(c=>c.overdue>0).sort((a,b)=>b.overdue-a.overdue);
+
+  document.getElementById('cl-stats').innerHTML=`
+    <div class="sc red"><div class="sc-l">Over Credit Limit</div><div class="sc-v r">${overLimit.length}</div></div>
+    <div class="sc amber"><div class="sc-l">Near Limit (90–99%)</div><div class="sc-v a">${nearLimit.length}</div></div>
+    <div class="sc amber"><div class="sc-l">Watch (70–89%)</div><div class="sc-v a">${watchList.length}</div></div>
+    <div class="sc"><div class="sc-l">Customers w/ Overdue</div><div class="sc-v">${allWithOverdue.length}</div></div>`;
+
+  // Render sorted by selector
+  const clFilterVal = (document.getElementById('cl-filter')||{}).value||'';
+  const filteredWithLimit = clFilterVal.trim()
+    ? withLimit.filter(c=>c.name.toLowerCase().includes(clFilterVal.trim().toLowerCase()))
+    : withLimit;
+  const clSortVal = (document.getElementById('cl-sort')||{}).value || 'util-desc';
+  const sorted = [...filteredWithLimit].sort((a,b)=>{
+    if(clSortVal==='util-asc') return a.utilization-b.utilization;
+    if(clSortVal==='overdue-desc') return b.overdue-a.overdue;
+    if(clSortVal==='name-asc') return a.name.localeCompare(b.name);
+    if(clSortVal==='name-desc') return b.name.localeCompare(a.name);
+    return b.utilization-a.utilization; // util-desc default
+  });
+
+  if (!sorted.length) {
+    document.getElementById('cl-list').innerHTML='<div class="empty"><div class="ei">✅</div><p>No credit limit data found in Aged Receivables</p><p style="font-size:12px;color:var(--text3);margin-top:8px">Note: ADV (advance payment) accounts have no credit limit set</p></div>';
+    return;
+  }
+
+  document.getElementById('cl-list').innerHTML = sorted.map((c,ci)=>{
+    const isOver = c.balance > c.creditLimit;
+    const isNear = !isOver && c.utilization >= 90;
+    const isWatch = !isOver && !isNear && c.utilization >= 70;
+    const cardClass = isOver ? 'cl-card' : (isNear||isWatch) ? 'near-card' : 'card';
+    const hdrClass = isOver ? 'cl-header' : (isNear||isWatch) ? 'near-header' : 'ch';
+    const bodyClass = isOver ? 'cl-body' : (isNear||isWatch) ? 'near-body' : 'cb';
+    const pct = c.utilization;
+    const pctColor = isOver?'var(--red)':isNear?'var(--amber)':isWatch?'var(--amber)':'var(--green)';
+    const statusBadge = isOver?'<span class="badge br">⚠️ Over Limit</span>':isNear?'<span class="badge ba">⚡ Near Limit</span>':isWatch?'<span class="badge ba">👀 Watch</span>':'<span class="badge bg">✓ OK</span>';
+    const barColor = isOver?'#ef4444':isNear?'#f59e0b':isWatch?'#f59e0b':'#2d7a52';
+    const barPct = Math.min(100,pct);
+
+    return`<div class="${cardClass}">
+      <div class="${hdrClass}" onclick="toggleCard('cl-bd-${ci}','cl-chev-${ci}')">
+        <span style="font-size:16px">${isOver?'🔴':isNear?'🟠':isWatch?'🟡':'🟢'}</span>
+        <span class="cname">${escH(c.name)}</span>
+        <span style="display:inline-flex;align-items:center;background:#0f2d4a;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;font-family:'DM Mono',monospace;margin-left:4px">${escH(c.code)}</span>
+        ${statusBadge}
+        <span class="badge bgr" style="margin-left:4px">${c.currency}</span>
+        <span style="font-size:13px;font-weight:700;color:${pctColor};margin-left:8px">${pct.toFixed(1)}% used</span>
+        <span class="chev" id="cl-chev-${ci}">▾</span>
+      </div>
+      <div class="${bodyClass} open" id="cl-bd-${ci}">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:14px 16px;background:${isOver?'var(--red-bg)':isNear?'var(--amber-bg)':'var(--surface3)'};border-bottom:1px solid var(--border)">
+          <div><div class="srl">Credit Limit</div><div class="srv">${fmt(c.creditLimit)}</div></div>
+          <div><div class="srl">Balance</div><div style="font-weight:700;font-size:14px;color:${isOver?'var(--red)':isNear?'var(--amber)':'var(--text)'}">${fmtC(c.balance, c.currency)}</div></div>
+          <div><div class="srl">% Limit Used</div><div style="font-weight:700;font-size:14px;color:${pctColor}">${pct.toFixed(1)}%</div></div>
+          <div><div class="srl">Overdue (Balance − Not Due)</div><div style="font-weight:700;font-size:14px;color:${c.overdue>0?'var(--red)':'var(--green)'}">${c.overdue>0?fmt(c.overdue):'—'}</div></div>
+        </div>
+        <div style="padding:10px 16px 14px;background:${isOver?'var(--red-bg)':isNear?'var(--amber-bg)':'var(--surface2)'};border-bottom:1px solid var(--border)">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Credit Limit Utilisation</div>
+          <div class="prog-bar-wrap"><div class="prog-bar" style="width:${barPct}%;background:${barColor}"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px">
+            <span>0</span><span style="font-weight:700;color:${pctColor}">${pct.toFixed(1)}% of ${fmt(c.creditLimit)}</span><span>${fmt(c.creditLimit)}</span>
+          </div>
+        </div>
+        <div style="padding:10px 16px;background:var(--surface3);font-size:12px;display:flex;gap:16px;flex-wrap:wrap">
+          <div><span style="color:var(--text3);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em">Payment Terms</span>&nbsp;&nbsp;<strong>${c.paymentTerms||'—'}</strong></div>
+          <div><span style="color:var(--text3);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em">Not Due</span>&nbsp;&nbsp;<strong>${fmtC(c.notDue, c.currency)}</strong></div>
+          ${isOver?`<div style="color:var(--red);font-weight:700">⚠️ Over limit by ${fmt(c.balance-c.creditLimit)}</div>`:''}
+        </div>
+        <div style="padding:10px 16px;background:var(--surface2);border-top:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn-sm" onclick="logEnqFromName('${escH(c.name).replace(/'/g,"\\'")}')">💬 Log enquiry</button>
+          ${isOver?'<span style="font-size:11px;color:var(--amber);font-weight:600;align-self:center">📎 Attach customer statement before emailing</span>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MATCH REPORT TAB
+// Statement invoices classified:
+//   Remitted (green)  — on remittance, excluded from overdue section
+//   Overdue (red)     — past due, not remitted, not a credit doc
+//   Under query (yellow) — invoice number matches an enquiry
+//   Not yet due       — neutral
+//   Credit docs       — NEVER overdue; green if on remittance
+// ─────────────────────────────────────────────────────────────────────────────
+function renderMatchReportTab() {
+  if (!S.stmtInvoices.length && !S.remittances.length) {
+    document.getElementById('me').style.display='block';
+    document.getElementById('mc').style.display='none';
+    return;
+  }
+  document.getElementById('me').style.display='none';
+  document.getElementById('mc').style.display='block';
+
+  // Build remittance lookup — match by invoice number (docNo) or external doc number (extDocNo)
+  const remInvNums = new Set();
+  S.remittances.forEach(r => r.invoices.forEach(inv => {
+    if(inv) {
+      remInvNums.add(inv.trim().toLowerCase());
+      // Also add without leading zeros / spaces
+      remInvNums.add(inv.trim().replace(/^0+/,'').toLowerCase());
+    }
+  }));
+
+  // Build enquiry invoice lookup
+  const enqInvNums = new Set();
+  S.enquiries.forEach(e => (e.invoices||'').split(/[,;\s]+/).forEach(i => { const t=i.trim(); if(t) enqInvNums.add(t.toLowerCase()); }));
+
+  // Classify invoices
+  const invoices = S.stmtInvoices.map(inv => {
+    const isCreditDoc = isCredit(inv.docType);
+    const docKey = (inv.docNo||'').trim().toLowerCase();
+    const extKey = (inv.extDocNo||'').trim().toLowerCase();
+    // Match remittance by docNo OR extDocNo — remittance PDFs use either format
+    const isRemitted = (docKey && remInvNums.has(docKey)) || (extKey && remInvNums.has(extKey));
+    // Credit docs are NEVER overdue
+    const isOverdue = !isCreditDoc && !isRemitted && inv.dueDate && inv.dueDate < TODAY && inv.amount > 0 && !isNaN(inv.amount);
+    const isUnderQuery = !isRemitted && enqInvNums.has(docKey);
+    const isNotDue = !isRemitted && !isOverdue && inv.amount > 0;
+    return {...inv, isCreditDoc, isRemitted, isOverdue, isUnderQuery, isNotDue};
+  });
+
+  // Match report excludes remitted (they are cleared per remittance)
+  const visibleInvoices = invoices.filter(i => !i.isRemitted);
+  const remittedInvs = invoices.filter(i => i.isRemitted);
+  const overdueInvs = visibleInvoices.filter(i => i.isOverdue).sort((a,b)=>(a.dueDate||0)-(b.dueDate||0));
+  const queryInvs = visibleInvoices.filter(i => i.isUnderQuery && !i.isOverdue);
+  const notDueInvs = visibleInvoices.filter(i => i.isNotDue && !i.isUnderQuery).sort((a,b)=>(a.dueDate||0)-(b.dueDate||0));
+
+  const totalOverdue = overdueInvs.reduce((s,i)=>s+i.amount,0);
+  const totalNotDue = notDueInvs.reduce((s,i)=>s+i.amount,0);
+  const totalRemitted = remittedInvs.reduce((s,i)=>s+i.amount,0);
+  const totalQuery = queryInvs.reduce((s,i)=>s+i.amount,0);
+
+  document.getElementById('mr-stats').innerHTML=`
+    <div class="sc red"><div class="sc-l">Overdue Invoices</div><div class="sc-v r">${overdueInvs.length}</div></div>
+    <div class="sc red"><div class="sc-l">Total Overdue</div><div class="sc-v r">${fmt(totalOverdue)}</div></div>
+    <div class="sc"><div class="sc-l">Not Yet Due</div><div class="sc-v">${notDueInvs.length}</div></div>
+    <div class="sc"><div class="sc-l">Covered by Remittance</div><div class="sc-v g">${remittedInvs.length}</div></div>`;
+
+  // Aged accounts reconciliation check
+  const mrReconEl = document.getElementById('mr-recon');
+  if (S.arCustomers.length && totalOverdue > 0) {
+    const stmtCustName = (S.files.stmt ? S.files.stmt.name.replace(/\.pdf$/i,'').replace(/[-_]/g,' ').trim() : '').toLowerCase();
+    const arMatch = S.arCustomers.find(c => {
+      const n = c.name.toLowerCase();
+      return stmtCustName.includes(n.split(' ')[0]) || n.includes(stmtCustName.split(' ')[0]);
+    });
+    if (arMatch && arMatch.overdue > 0) {
+      const diff = Math.abs(totalOverdue - arMatch.overdue);
+      const pct = (diff / arMatch.overdue * 100).toFixed(1);
+      const isMatch = diff < 1;
+      mrReconEl.style.display = 'block';
+      mrReconEl.className = 'abox ' + (isMatch ? 'ao' : 'aw');
+      mrReconEl.innerHTML = isMatch
+        ? `✅ <strong>Reconciled:</strong> Match Report overdue ${fmt(totalOverdue)} aligns with Aged Receivables overdue ${fmt(arMatch.overdue)} for ${escH(arMatch.name)}`
+        : `⚠️ <strong>Reconciliation check:</strong> Match Report overdue ${fmt(totalOverdue)} vs Aged Receivables overdue ${fmt(arMatch.overdue)} for ${escH(arMatch.name)} — difference ${fmt(diff)} (${pct}%). Review statement date vs AR report date.`;
+    } else {
+      mrReconEl.style.display = 'none';
+    }
+  } else {
+    mrReconEl.style.display = 'none';
+  }
+
+  function rowBg(inv) {
+    if (inv.isOverdue) return '#fef2f2';
+    if (inv.isUnderQuery) return '#fef6e8';
+    return '';
+  }
+  function rowStyle(inv) {
+    const bg = rowBg(inv);
+    return bg ? `style="background:${bg}"` : '';
+  }
+
+  function invTable(rows, title, bgColor, showStatus) {
+    if(!rows.length) return `<div style="padding:12px 16px;font-size:12px;color:var(--text3)">No ${title.toLowerCase()} invoices</div>`;
+    const total = rows.reduce((s,i)=>s+i.amount,0);
+    return`<div style="border-top:1px solid var(--border)">
+      <div style="padding:10px 16px;background:${bgColor||'var(--surface3)'};font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">${title}</div>
+      <table class="tbl">
+        <thead><tr><th>Invoice No.</th><th>Ext. Doc No.</th><th>Doc Type</th><th>Due Date</th><th>Amount</th>${showStatus?'<th>Status</th>':''}</tr></thead>
+        <tbody>${rows.map(inv=>{
+          const dateColor = inv.isOverdue ? 'color:var(--red);font-weight:700' : '';
+          const statusCell = showStatus ? `<td style="font-size:11px">${inv.isOverdue?'<span style="color:var(--red);font-weight:700">⚠ Overdue</span>':inv.isUnderQuery?'<span style="color:var(--amber);font-weight:700">🟡 Under Query</span>':'<span style="color:var(--text3)">Not yet due</span>'}</td>` : '';
+          return`<tr ${rowStyle(inv)}>
+            <td style="font-family:'DM Mono',monospace;font-weight:500">${escH(inv.docNo)}</td>
+            <td style="font-size:11px;color:var(--text3)">${escH(inv.extDocNo)||'—'}</td>
+            <td><span class="badge bgr" style="font-size:10px">${escH(inv.docType)}</span></td>
+            <td style="${dateColor}">${fmtDate(inv.dueDate)}</td>
+            <td style="font-weight:700">${fmt(inv.amount)}</td>
+            ${statusCell}
+          </tr>`;
+        }).join('')}
+        <tr style="background:var(--surface3)"><td colspan="${showStatus?5:4}" style="font-weight:700;padding:9px 14px">Total</td><td style="font-weight:700;padding:9px 14px;font-size:14px">${fmt(total)}</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+  }
+
+  function remTable(rows) {
+    if(!rows.length) return '';
+    const total = rows.reduce((s,i)=>s+i.amount,0);
+    return`<div style="border-top:1px solid var(--border)">
+      <div style="padding:10px 16px;background:#e8f5ee;font-size:11px;font-weight:700;color:var(--green-dark);text-transform:uppercase;letter-spacing:.05em">✅ Covered by Remittance — will be cleared by customer</div>
+      <table class="tbl">
+        <thead><tr><th>Invoice No.</th><th>Ext. Doc No.</th><th>Doc Type</th><th>Due Date</th><th>Amount</th></tr></thead>
+        <tbody>${rows.map(inv=>`<tr style="background:#f0faf4">
+          <td style="font-family:'DM Mono',monospace;font-weight:500;color:var(--green-dark)">${escH(inv.docNo)}</td>
+          <td style="font-size:11px;color:var(--text3)">${escH(inv.extDocNo)||'—'}</td>
+          <td><span class="badge bg" style="font-size:10px">${escH(inv.docType)}</span></td>
+          <td style="color:var(--green)">${fmtDate(inv.dueDate)}</td>
+          <td style="font-weight:700;color:var(--green)">${fmt(inv.amount)}</td>
+        </tr>`).join('')}
+        <tr style="background:#e8f5ee"><td colspan="4" style="font-weight:700;padding:9px 14px;color:var(--green-dark)">Total Remitted</td><td style="font-weight:700;padding:9px 14px;font-size:14px;color:var(--green-dark)">${fmt(total)}</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+  }
+
+  // Group by customer name
+  // Determine customer name: use remittance customer name if any remittance invoice matches
+  // This ensures the group header shows the name Pavi entered, not 'Statement'
+  var _remCustName = '';
+  if (S.remittances.length) {
+    // Use first remittance that has matching invoices in the statement
+    for (var _ri = 0; _ri < S.remittances.length; _ri++) {
+      var _rem = S.remittances[_ri];
+      var _remSet = new Set(_rem.invoices.map(function(i){ return i.trim().toLowerCase(); }));
+      var _hasMatch = invoices.some(function(inv) {
+        return _remSet.has((inv.docNo||'').toLowerCase()) || _remSet.has((inv.extDocNo||'').toLowerCase());
+      });
+      if (_hasMatch) { _remCustName = _rem.customer; break; }
+    }
+    // Fallback: use first remittance customer name regardless
+    if (!_remCustName) _remCustName = S.remittances[0].customer;
+  }
+
+  const customerGroups = {};
+  invoices.forEach(inv => {
+    const key = _remCustName || inv.customerName || 'Statement';
+    if (!customerGroups[key]) customerGroups[key] = [];
+    customerGroups[key].push(inv);
+  });
+
+  const mrSortVal = (document.getElementById('mr-sort')||{}).value || 'overdue-desc';
+  let custEntries = Object.entries(customerGroups);
+  custEntries.sort((a,b)=>{
+    const aOD = a[1].filter(i=>i.isOverdue).reduce((s,i)=>s+i.amount,0);
+    const bOD = b[1].filter(i=>i.isOverdue).reduce((s,i)=>s+i.amount,0);
+    const aAmt = a[1].reduce((s,i)=>s+Math.max(0,i.amount),0);
+    const bAmt = b[1].reduce((s,i)=>s+Math.max(0,i.amount),0);
+    if(mrSortVal==='name-asc') return a[0].localeCompare(b[0]);
+    if(mrSortVal==='name-desc') return b[0].localeCompare(a[0]);
+    if(mrSortVal==='amount-desc') return bAmt-aAmt;
+    return bOD-aOD;
+  });
+
+  window._mrCustEntries = custEntries; // expose for email draft
+  document.getElementById('mr-list').innerHTML = custEntries.map(([custName, invs], ci) => {
+    const custOverdue = invs.filter(i=>i.isOverdue);
+    const custQuery = invs.filter(i=>i.isUnderQuery && !i.isOverdue);
+    const custNotDue = invs.filter(i=>i.isNotDue && !i.isUnderQuery);
+    const custRemitted = invs.filter(i=>i.isRemitted);
+    const totalCustAmt = invs.filter(i=>!i.isRemitted).reduce((s,i)=>s+Math.max(0,i.amount),0);
+    const hasOverdue = custOverdue.length > 0;
+    const hasQuery = custQuery.length > 0;
+    return`<div class="card" style="margin-bottom:12px">
+      <div class="ch" onclick="toggleCard('mr-bd-${ci}','mr-chev-${ci}')">
+        <span style="font-size:15px">🏢</span>
+        <span class="cname">${(()=>{const ar=S.arCustomers.find(a=>a.name===custName||a.code===custName||(custName&&a.name.toLowerCase().includes(custName.toLowerCase().split(' ')[0])));return ar?escH(ar.name):escH(custName);})()}</span>
+        ${(()=>{const ar=S.arCustomers.find(a=>a.name===custName||a.code===custName||(custName&&a.name.toLowerCase().includes(custName.toLowerCase().split(' ')[0])));return ar&&ar.code?`<span style="display:inline-flex;align-items:center;background:#0f2d4a;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;font-family:'DM Mono',monospace;margin-left:5px">${escH(ar.code)}</span>`:'';})()}
+        ${hasOverdue?`<span class="badge br">${custOverdue.length} overdue</span>`:''}
+        ${hasQuery?`<span class="badge ba">${custQuery.length} under query</span>`:''}
+        ${custRemitted.length?`<span class="badge bg" style="margin-left:4px">${custRemitted.length} remitted</span>`:''}
+        <span style="font-size:13px;font-weight:700;margin-left:8px">${fmt(totalCustAmt)}</span>
+        ${hasOverdue && custRemitted.length ? `<button class="btn-email" style="background:linear-gradient(135deg,#1a4080,#1e4d8c);color:#fff;border:none;margin-left:8px" onclick="event.stopPropagation();openRemittanceEmailDraft(${ci})" title="Draft remittance chase email">✉️ Remittance Chase</button>` : ''}
+        <span class="chev" id="mr-chev-${ci}">▾</span>
+      </div>
+      <div class="cb mr-body" id="mr-bd-${ci}">
+        ${custOverdue.length ? invTable(custOverdue,'⚠ Overdue Invoices — chase these (not on remittance)','var(--red-bg)',false) : '<div style="padding:10px 16px;font-size:12px;color:var(--text3)">No overdue invoices</div>'}
+        ${custQuery.length ? invTable(custQuery,'🟡 Under Query','var(--amber-bg)',false) : ''}
+        ${custNotDue.length ? invTable(custNotDue,'Not Yet Due','var(--surface3)',false) : ''}
+        ${custRemitted.length ? remTable(custRemitted) : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BULK EMAILS TAB
+// Simple list of all customers with balance > 0 from Summary Aging
+// ─────────────────────────────────────────────────────────────────────────────
+function renderBulkEmailsTab() {
+  if (!S.saCustomers.length && !S.arCustomers.length) {
+    document.getElementById('be').style.display='block';
+    document.getElementById('bc').style.display='none';
+    return;
+  }
+  document.getElementById('be').style.display='none';
+  document.getElementById('bc').style.display='block';
+
+  const filterVal = (document.getElementById('bulk-filter')||{}).value||'';
+  const sortVal = (document.getElementById('bulk-sort')||{}).value||'name-asc';
+
+  // Use AR names+codes (accurate full names). If AR not loaded, fall back to SA.
+  let withBalance;
+  if (S.arCustomers.length) {
+    // Build from AR (has accurate full names + codes)
+    // Enrich with SA overdueAmount where available
+    const saByName = {};
+    S.saCustomers.forEach(c => { saByName[c.name.toLowerCase().trim()] = c; });
+    const saByWord = {};
+    S.saCustomers.forEach(c => {
+      const w = c.name.toLowerCase().split(/\s+/).find(x=>x.length>=4);
+      if(w && !saByWord[w]) saByWord[w] = c;
+    });
+    withBalance = S.arCustomers
+      .filter(c => c.balance > 0)
+      .map(c => {
+        const key = c.name.toLowerCase().trim();
+        const saMatch = saByName[key] || saByWord[key.split(' ').find(x=>x.length>=4)] ||
+          S.saCustomers.find(s => s.name.toLowerCase().includes(c.name.toLowerCase().split(' ')[0]) || c.name.toLowerCase().includes(s.name.toLowerCase().split(' ')[0]));
+        return {
+          code: c.code,
+          name: c.name,
+          currency: c.currency,
+          balance: c.balance,
+          overdueAmount: (saMatch ? saMatch.overdueAmount : 0) || c.overdue || 0
+        };
+      });
+  } else {
+    withBalance = S.saCustomers.filter(c=>c.balance>0).map(c=>({...c, code: c.code||''}));
+  }
+  if (filterVal.trim()) {
+    const q = filterVal.trim().toLowerCase();
+    withBalance = withBalance.filter(c=>c.name.toLowerCase().includes(q));
+  }
+  withBalance.sort((a,b)=>{
+    if(sortVal==='name-desc') return b.name.localeCompare(a.name);
+    if(sortVal==='balance-desc') return b.balance-a.balance;
+    if(sortVal==='overdue-desc') return b.overdueAmount-a.overdueAmount;
+    return a.name.localeCompare(b.name); // name-asc default
+  });
+
+  if (!withBalance.length) {
+    document.getElementById('bulk-list').innerHTML='<div class="empty"><div class="ei">✅</div><p>No customers match your filter</p></div>';
+    return;
+  }
+
+  document.getElementById('bulk-list').innerHTML=`
+    <table class="tbl">
+      <thead><tr><th style="width:32px" title="Emailed?">✓</th><th>#</th><th>Customer</th><th>Currency</th><th>Balance</th><th>Overdue</th><th></th></tr></thead>
+      <tbody>${withBalance.map((c,i)=>`
+        <tr>
+          <td><button class="emailed-tog${_emailedCustomers.has(c.name)?' done':''}" title="${_emailedCustomers.has(c.name)?'Emailed — click to unmark':'Not emailed — click to mark'}" onclick="toggleEmailed('${c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">✓</button></td>
+          <td style="color:var(--text3);font-weight:500">${i+1}</td>
+          <td><div style="font-weight:600;font-size:13px">${(()=>{const ar=_arEnrich(c);return escH(ar.name);})()}</div>${(()=>{const ar=_arEnrich(c);return ar.code?`<span style="display:inline-flex;align-items:center;background:#0f2d4a;color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:5px;font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.04em">${escH(ar.code)}</span>`:'';})()} </td>
+          <td><span class="badge bgr">${c.currency}</span></td>
+          <td style="font-weight:700">${fmtC(c.balance, c.currency)}</td>
+          <td style="color:${c.overdueAmount>0?'var(--red)':'var(--text3)'};font-weight:${c.overdueAmount>0?'700':'400'}">${c.overdueAmount>0?fmt(c.overdueAmount):'—'}</td>
+          <td style="display:flex;gap:5px;flex-wrap:wrap">
+            <button class="btn-sm" style="background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue)" onclick="openEmailDraftByName('${c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">✉ Draft</button>
+            <button class="btn-sm" onclick="logEnqFromName('${escH(c.name).replace(/'/g,"\\'")}')">+ Enquiry</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function copyBulkList() {
+  const withBalance = S.saCustomers.filter(c=>c.balance>0).sort((a,b)=>a.name.localeCompare(b.name));
+  const text = withBalance.map((c,i)=>`${i+1}. ${c.name} — Balance: ${fmtC(c.balance, c.currency)}${c.overdueAmount>0?' | Overdue: '+fmt(c.overdueAmount):''}`).join('\n');
+  navigator.clipboard.writeText(text).then(()=>toast('ok','Copied','Paste into email or spreadsheet'));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXCEL EXPORTS
+// ─────────────────────────────────────────────────────────────────────────────
+function exportSAXLSX() {
+  if (!S.saCustomers.length) { toast('warn','No data','Run CreditFlow with Summary Aging PDF first'); return; }
+
+  const wb = XLSX.utils.book_new();
+  const reportDate = TODAY.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  // Sheet 1: Overdue customers
+  const overdueData = [
+    ['NEW WAY INTERNATIONAL — OVERDUE CUSTOMERS REPORT'],
+    ['Report Date: '+reportDate],
+    ['Source: Customer — Summary Aging PDF (Overdue = Col4 + Col5 + Col6)'],
+    [],
+    ['Customer Name','Currency','Overdue Col 4 (Before)','Overdue Col 5','Overdue Col 6','Total Overdue','Total Balance']
+  ];
+  S.saCustomers
+    .filter(c=>c.overdueAmount>0)
+    .sort((a,b)=>b.overdueAmount-a.overdueAmount)
+    .forEach(c=>overdueData.push([c.name, c.currency, c.col4, c.col5, c.col6, c.overdueAmount, c.balance]));
+  overdueData.push([]);
+  overdueData.push(['TOTAL','','','','',
+    S.saCustomers.filter(c=>c.overdueAmount>0).reduce((s,c)=>s+c.overdueAmount,0),
+    S.saCustomers.filter(c=>c.overdueAmount>0).reduce((s,c)=>s+c.balance,0)
+  ]);
+
+  const ws1 = XLSX.utils.aoa_to_sheet(overdueData);
+  ws1['!cols']=[{wch:40},{wch:10},{wch:18},{wch:18},{wch:18},{wch:18},{wch:18}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Overdue Customers');
+
+  // Sheet 2: All customers with balance
+  const allBalData = [
+    ['NEW WAY INTERNATIONAL — ALL CUSTOMERS WITH BALANCE'],
+    ['Report Date: '+reportDate],
+    ['Source: Customer — Summary Aging PDF'],
+    [],
+    ['Customer Name','Currency','Total Balance','Overdue Amount']
+  ];
+  S.saCustomers
+    .filter(c=>c.balance>0)
+    .sort((a,b)=>b.balance-a.balance)
+    .forEach(c=>allBalData.push([c.name, c.currency, c.balance, c.overdueAmount>0?c.overdueAmount:0]));
+
+  const ws2 = XLSX.utils.aoa_to_sheet(allBalData);
+  ws2['!cols']=[{wch:40},{wch:10},{wch:18},{wch:18}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'All Balances');
+
+  XLSX.writeFile(wb, `NWI_Summary_Aging_${TODAY.toLocaleDateString('en-GB').replace(/\//g,'-')}.xlsx`);
+  toast('ok','Exported','Summary Aging report downloaded');
+}
+
+function exportARXLSX() {
+  if (!S.arCustomers.length) { toast('warn','No data','Run CreditFlow with Aged Receivables PDF first'); return; }
+
+  const wb = XLSX.utils.book_new();
+  const reportDate = TODAY.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  const data = [
+    ['NEW WAY INTERNATIONAL — CREDIT LIMIT & OVERDUE ANALYSIS'],
+    ['Report Date: '+reportDate],
+    ['Source: Aged Accounts Receivable PDF'],
+    ['Note: Over-credit-limit flag excludes unapproved sales orders'],
+    [],
+    ['Customer Name','Currency','Credit Limit','Balance','Not Due','Overdue (Bal − Not Due)','% Limit Used','Payment Terms','Status']
+  ];
+
+  [...S.arCustomers]
+    .filter(c=>c.creditLimit>0)
+    .sort((a,b)=>b.utilization-a.utilization)
+    .forEach(c=>{
+      const status = c.balance>c.creditLimit?'OVER LIMIT':c.utilization>=90?'NEAR LIMIT (≥90%)':c.utilization>=70?'WATCH (≥70%)':'OK';
+      data.push([c.name,c.currency,c.creditLimit,c.balance,c.notDue,c.overdue>0?c.overdue:0,+(c.utilization.toFixed(1)),c.paymentTerms,status]);
+    });
+
+  // Also include all customers (even those with overdue but no limit)
+  const noLimitOverdue = S.arCustomers.filter(c=>c.creditLimit===0&&c.overdue>0).sort((a,b)=>b.overdue-a.overdue);
+  if (noLimitOverdue.length) {
+    data.push([]);
+    data.push(['--- ADV / No Credit Limit Customers with Overdue ---']);
+    noLimitOverdue.forEach(c=>{
+      data.push([c.name,c.currency,'ADV/None',c.balance,c.notDue,c.overdue>0?c.overdue:0,'—',c.paymentTerms,'ADV - No Limit']);
+    });
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:40},{wch:10},{wch:14},{wch:14},{wch:14},{wch:20},{wch:14},{wch:16},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Credit Limit Analysis');
+  XLSX.writeFile(wb, `NWI_AgedReceivables_${TODAY.toLocaleDateString('en-GB').replace(/\//g,'-')}.xlsx`);
+  toast('ok','Exported','Aged Receivables report downloaded');
+}
+
+function exportMatchXLSX() {
+  if (!S.stmtInvoices.length) { toast('warn','No data','Run CreditFlow with a Statement PDF first'); return; }
+
+  const remInvNums = new Set();
+  S.remittances.forEach(r=>r.invoices.forEach(inv=>remInvNums.add(inv.toLowerCase())));
+
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ['NEW WAY INTERNATIONAL — MATCH REPORT'],
+    ['Report Date: '+TODAY.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})],
+    [],
+    ['Customer','Invoice No.','External Doc No.','Document Type','Due Date','Amount','Status']
+  ];
+
+  S.stmtInvoices.forEach(inv=>{
+    const isRemitted=inv.docNo&&remInvNums.has(inv.docNo.toLowerCase());
+    const isCreditDoc=isCredit(inv.docType);
+    const isOverdue=!isCreditDoc&&inv.dueDate&&inv.dueDate<TODAY&&inv.amount>0&&!isRemitted;
+    const status=isRemitted?'Covered by Remittance':isOverdue?'OVERDUE':isCreditDoc?'Credit (never overdue)':'Not Yet Due';
+    data.push([inv.customerName,inv.docNo,inv.extDocNo,inv.docType,fmtDate(inv.dueDate),inv.amount,status]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:30},{wch:18},{wch:18},{wch:16},{wch:14},{wch:14},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Match Report');
+  XLSX.writeFile(wb, `NWI_MatchReport_${TODAY.toLocaleDateString('en-GB').replace(/\//g,'-')}.xlsx`);
+  toast('ok','Exported','Match report downloaded');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENQUIRY PERSISTENCE (localStorage)
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// DISPUTE FLAGS — per invoice
+// ─────────────────────────────────────────────────────────────────────────────
+let _disputes = new Set(JSON.parse(localStorage.getItem('nwi_disputes')||'[]'));
+
+function toggleDispute(docNo) {
+  if (_disputes.has(docNo)) _disputes.delete(docNo);
+  else _disputes.add(docNo);
+  try { localStorage.setItem('nwi_disputes', JSON.stringify([..._disputes])); } catch(e) {}
+  renderMatchReportTab();
+}
+
+function isDisputed(docNo) { return _disputes.has(docNo); }
+
+function saveEnquiriesToStorage() {
+  try { localStorage.setItem('nwi_enquiries', JSON.stringify(S.enquiries)); } catch(e) {}
+}
+
+function loadEnquiriesFromStorage() {
+  try {
+    const raw = localStorage.getItem('nwi_enquiries');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) S.enquiries = parsed;
+    }
+  } catch(e) {}
+}
+
+// Hard-coded seed enquiries — only added if no existing data found in localStorage
+// This ensures any manually recovered entries survive future deploys
+function _seedDefaultEnquiries() {
+  const key = 'nwi_enquiries';
+  const existing = localStorage.getItem(key);
+  if (existing) return; // never overwrite real data
+  const seeds = [
+    {
+      id: 1717000001,
+      customer: 'AMC DOO',
+      invoices: '',
+      amount: '',
+      priority: 'med',
+      issue: '',
+      customerSaid: '',
+      lastComm: '',
+      nextAction: '',
+      loggedAt: '11/06/2026'
+    }
+  ];
+  try { localStorage.setItem(key, JSON.stringify(seeds)); S.enquiries = seeds; } catch(e) {}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REMITTANCE PERSISTENCE (localStorage)
+// ─────────────────────────────────────────────────────────────────────────────
+function saveRemittancesToStorage() {
+  try { localStorage.setItem('nwi_remittances', JSON.stringify(S.remittances)); } catch(e) {}
+}
+
+function loadRemittancesFromStorage() {
+  try {
+    const raw = localStorage.getItem('nwi_remittances');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) S.remittances = parsed;
+    }
+  } catch(e) {}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATEMENT PERSISTENCE (localStorage)
+// ─────────────────────────────────────────────────────────────────────────────
+function saveStmtToStorage(invoices, filename) {
+  try {
+    // Convert Date objects to ISO strings for JSON serialisation
+    const serialisable = invoices.map(inv => ({
+      ...inv,
+      dueDate: inv.dueDate ? inv.dueDate.toISOString() : null
+    }));
+    localStorage.setItem('nwi_stmt_invoices', JSON.stringify(serialisable));
+    localStorage.setItem('nwi_stmt_filename', filename||'');
+  } catch(e) {}
+}
+
+function loadStmtFromStorage() {
+  try {
+    const raw = localStorage.getItem('nwi_stmt_invoices');
+    const fname = localStorage.getItem('nwi_stmt_filename')||'';
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        S.stmtInvoices = parsed.map(inv => ({
+          ...inv,
+          dueDate: inv.dueDate ? new Date(inv.dueDate) : null
+        }));
+        // Restore upload zone appearance
+        if (fname) {
+          const zone = document.getElementById('z-stmt');
+          if (zone) {
+            zone.className = 'uz ok';
+            document.getElementById('zi-stmt').textContent = '✅';
+            document.getElementById('zt-stmt').textContent = '✅ '+fname+' (saved)';
+            document.getElementById('zf-stmt').textContent = 'Restored from previous session';
+          }
+        }
+      }
+    }
+  } catch(e) {}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENQUIRIES
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// CUSTOMER NAME AUTOCOMPLETE DROPDOWN
+// ─────────────────────────────────────────────────────────────────────────────
+function _getAllCustomerNames() {
+  const names = new Set();
+  (S.saCustomers||[]).forEach(c => names.add(c.name));
+  (S.arCustomers||[]).forEach(c => names.add(c.name));
+  return [...names].sort();
+}
+
+function showCustDropdown(inputId, ddId) {
+  const input = document.getElementById(inputId);
+  const dd = document.getElementById(ddId);
+  if (!input || !dd) return;
+  const val = input.value.toLowerCase().trim();
+  const all = _getAllCustomerNames();
+  const matches = val.length === 0
+    ? all.slice(0, 20)
+    : all.filter(n => n.toLowerCase().includes(val)).slice(0, 20);
+  if (!matches.length) { dd.classList.remove('open'); return; }
+  dd.innerHTML = matches.map(n =>
+    `<div class="cust-opt" onmousedown="pickCust('${inputId}','${ddId}','${n.replace(/'/g,"\'")}')">
+      ${escH(n)}
+    </div>`
+  ).join('');
+  dd.classList.add('open');
+}
+
+function hideCustDropdown(ddId) {
+  const dd = document.getElementById(ddId);
+  if (dd) dd.classList.remove('open');
+}
+
+function pickCust(inputId, ddId, name) {
+  const input = document.getElementById(inputId);
+  if (input) { input.value = name; input.style.borderColor='var(--green-mid)'; input.style.background='var(--green-bg)'; }
+  hideCustDropdown(ddId);
+}
+
+let enqOpen = false;
+function toggleEnqForm() { enqOpen=!enqOpen; document.getElementById('enq-form').style.display=enqOpen?'block':'none'; }
+
+function saveEnquiry() {
+  const cust=document.getElementById('eq-cust').value.trim();
+  if(!cust){toast('warn','Missing customer name','');return;}
+  const form = document.getElementById('enq-form');
+  const editId = form && form.dataset.editId ? parseInt(form.dataset.editId) : null;
+  if (editId) {
+    // Update existing enquiry
+    const idx = S.enquiries.findIndex(e => e.id === editId);
+    if (idx >= 0) {
+      S.enquiries[idx] = {
+        ...S.enquiries[idx],
+        customer: cust,
+        invoices: document.getElementById('eq-inv').value.trim(),
+        amount: document.getElementById('eq-amt').value.trim(),
+        priority: document.getElementById('eq-pri').value,
+        issue: document.getElementById('eq-issue').value.trim(),
+        customerSaid: document.getElementById('eq-said').value.trim(),
+        lastComm: document.getElementById('eq-date').value.trim(),
+        nextAction: document.getElementById('eq-next').value.trim(),
+        updatedAt: new Date().toLocaleDateString('en-GB')
+      };
+      form.dataset.editId = '';
+      const btn = document.getElementById('enq-save-btn');
+      if (btn) btn.textContent = '+ Save Enquiry';
+      saveEnquiriesToStorage(); renderEnquiries(); updateEnqBadge();
+      toggleEnqForm();
+      toast('ok','Enquiry updated','Changes saved');
+      return;
+    }
+  }
+  S.enquiries.unshift({
+    id:Date.now(),customer:cust,
+    invoices:document.getElementById('eq-inv').value.trim(),
+    amount:document.getElementById('eq-amt').value.trim(),
+    priority:document.getElementById('eq-pri').value,
+    issue:document.getElementById('eq-issue').value.trim(),
+    customerSaid:document.getElementById('eq-said').value.trim(),
+    lastComm:document.getElementById('eq-date').value.trim(),
+    nextAction:document.getElementById('eq-next').value.trim(),
+    loggedAt:new Date().toLocaleDateString('en-GB')
+  });
+  ['eq-cust','eq-inv','eq-amt','eq-issue','eq-said','eq-date','eq-next'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('eq-pri').value='med';
+  document.getElementById('enq-form').style.display='none'; enqOpen=false;
+  renderEnquiries(); updateEnqBadge();
+  saveEnquiriesToStorage();
+  toast('ok','Enquiry logged',cust);
+}
+
+function logEnqFromName(name) {
+  document.getElementById('eq-cust').value=name;
+  document.getElementById('enq-form').style.display='block'; enqOpen=true;
+  st('enquiry');
+  setTimeout(()=>document.getElementById('eq-issue').focus(),100);
+}
+
+function editEnq(id) {
+  const enq = S.enquiries.find(e => e.id === id);
+  if (!enq) return;
+  // Open the enquiry form and pre-fill with existing data
+  enqOpen = true;
+  const form = document.getElementById('enq-form');
+  if (form) form.style.display = 'block';
+  document.getElementById('eq-cust').value  = enq.customer || '';
+  document.getElementById('eq-inv').value   = enq.invoices || '';
+  document.getElementById('eq-amt').value   = enq.amount   || '';
+  document.getElementById('eq-pri').value   = enq.priority || 'med';
+  document.getElementById('eq-issue').value = enq.issue    || '';
+  document.getElementById('eq-said').value  = enq.customerSaid || '';
+  document.getElementById('eq-date').value  = enq.lastComm || '';
+  document.getElementById('eq-next').value  = enq.nextAction || '';
+  // Store the id being edited so saveEnquiry knows to update instead of create
+  document.getElementById('enq-form').dataset.editId = String(id);
+  const btn = document.getElementById('enq-save-btn');
+  if (btn) btn.textContent = '💾 Update Enquiry';
+  // Scroll to form
+  form.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function resolveEnq(id){S.enquiries=S.enquiries.filter(e=>e.id!==id);renderEnquiries();updateEnqBadge();saveEnquiriesToStorage();}
+function deleteEnq(id){S.enquiries=S.enquiries.filter(e=>e.id!==id);renderEnquiries();updateEnqBadge();saveEnquiriesToStorage();}
+
+function updateEnqBadge(){
+  const n=S.enquiries.length;
+  document.getElementById('t-enq').innerHTML=`<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Enquiries${n>0?` <span class="tb">${n}</span>`:''}`;
+}
+
+function exportEnquiriesXLSX() {
+  if (!S.enquiries.length) { toast('warn','No enquiries','Log some enquiries first'); return; }
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ['NEW WAY INTERNATIONAL — ENQUIRIES LOG'],
+    ['Exported: '+TODAY.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})],
+    [],
+    ['Customer','Invoice(s)','Amount (£)','Priority','Enquiry / Dispute','Customer Said','Last Communication','Next Action','Date Logged']
+  ];
+  S.enquiries.forEach(e => {
+    data.push([
+      e.customer, e.invoices||'', e.amount||'',
+      e.priority==='high'?'High':e.priority==='med'?'Medium':'Low',
+      e.issue||'', e.customerSaid||'', e.lastComm||'', e.nextAction||'', e.loggedAt||''
+    ]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:30},{wch:20},{wch:12},{wch:10},{wch:40},{wch:35},{wch:18},{wch:30},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Enquiries');
+  XLSX.writeFile(wb, 'NWI_Enquiries_'+TODAY.toLocaleDateString('en-GB').replace(/\//g,'-')+'.xlsx');
+  toast('ok','Enquiries exported','Excel file downloaded');
+}
+
+function renderEnquiries(){
+  const list=document.getElementById('enq-list'), empty=document.getElementById('enq-empty');
+  const enqFilterVal = (document.getElementById('enq-filter')||{}).value||'';
+  const filteredEnqs = enqFilterVal.trim()
+    ? S.enquiries.filter(e=>e.customer.toLowerCase().includes(enqFilterVal.trim().toLowerCase()))
+    : S.enquiries;
+  if(!filteredEnqs.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const pc={high:'ph',med:'pm',low:'pl'}, pl={high:'🔴 High',med:'🟡 Medium',low:'🟢 Low'}, pb={high:'br',med:'ba',low:'bg'};
+  list.innerHTML=filteredEnqs.map(e=>`<div class="ecard ${pc[e.priority]}">
+    <div class="eh"><div style="flex:1">
+      <div style="font-weight:700;font-size:14px;margin-bottom:7px">${escH(e.customer)}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge ${pb[e.priority]}">${pl[e.priority]}</span>
+        ${e.invoices?`<span class="badge bgr">${escH(e.invoices)}</span>`:''}
+        ${e.amount?`<span class="badge bgr">£${escH(e.amount)}</span>`:''}
+        <span class="badge bgr">Logged ${e.loggedAt}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;flex-shrink:0">
+      <button class="btn-sm" onclick="editEnq(${e.id})" title="Edit this enquiry">✏️ Edit</button>
+      <button class="btn-sm" onclick="resolveEnq(${e.id})">✓ Resolved</button>
+      <button class="btn-sm" onclick="deleteEnq(${e.id})">🗑️</button>
+    </div></div>
+    <div class="efields">
+      ${e.issue?`<div class="ef"><div class="efl">Enquiry</div><div class="efv">${escH(e.issue)}</div></div>`:''}
+      ${e.customerSaid?`<div class="ef"><div class="efl">Customer said</div><div class="efv">${escH(e.customerSaid)}</div></div>`:''}
+      ${e.lastComm?`<div class="ef"><div class="efl">Last communication</div><div class="efv">${escH(e.lastComm)}</div></div>`:''}
+      ${e.nextAction?`<div class="ef eff"><div class="efl">Next action</div><div class="efv">${escH(e.nextAction)}</div></div>`:''}
+    </div>
+  </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DRAG & DROP
+// ─────────────────────────────────────────────────────────────────────────────
+['sa','ar','stmt'].forEach(type=>{
+  const zone=document.getElementById('z-'+type);
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+  zone.addEventListener('drop',e=>{
+    e.preventDefault(); zone.classList.remove('dragover');
+    const file=e.dataTransfer.files[0]; if(!file) return;
+    const input=document.getElementById('in-'+type);
+    const dt=new DataTransfer(); dt.items.add(file); input.files=dt.files;
+    handlePDFUpload(type,input);
+  });
+});
+
+// Stmt drag/drop (accumulates multiple files)
+(function(){
+  const zone = document.getElementById('z-stmt');
+  if (!zone) return;
+  zone.addEventListener('dragover', e=>{e.preventDefault(); zone.classList.add('dragover');});
+  zone.addEventListener('dragleave', ()=>zone.classList.remove('dragover'));
+  zone.addEventListener('drop', async e=>{
+    e.preventDefault(); zone.classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files).filter(f=>f.name.toLowerCase().endsWith('.pdf'));
+    if (!files.length) return;
+    for (const file of files) await handlePDFUpload('stmt', {files:[file]});
+  });
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+_loadContactsFromStorage();
+loadEnquiriesFromStorage();
+_seedDefaultEnquiries();
+loadRemittancesFromStorage();
+loadStmtFromStorage();
+try {
+  const savedLabels = localStorage.getItem('nwi_sa_col_labels');
+  if (savedLabels) S.saColLabels = JSON.parse(savedLabels);
+} catch(e) {}
+// Restore parsed SA/AR data so tabs show data on refresh without re-uploading
+try {
+  const rawSA = localStorage.getItem('nwi_sa_customers');
+  if (rawSA) { S.saCustomers = JSON.parse(rawSA); }
+} catch(e) {}
+try {
+  const rawAR = localStorage.getItem('nwi_ar_customers');
+  if (rawAR) {
+    S.arCustomers = JSON.parse(rawAR);
+    // Restore derived field
+    S.arCustomers.forEach(c => { if(c.creditLimit>0) c.utilization = c.balance/c.creditLimit*100; });
+  }
+} catch(e) {}
+renderEnquiries();
+updateEnqBadge();
+renderRemList();
+updateReadiness();
+// Render all tabs that have persisted data loaded from localStorage
+if (S.saCustomers.length || S.arCustomers.length) {
+  renderSummaryAgingTab();
+  renderAgedReceivablesTab();
+  renderBulkEmailsTab();
+}
+if (S.stmtInvoices.length || S.remittances.length) renderMatchReportTab();
+updateTabBadges();
+// Restore saved Gmail client ID
+(function(){
+  const stored = localStorage.getItem('nwi_gmail_client_id');
+  if (stored) { const el = document.getElementById('gmail-client-id'); if(el) el.value = stored; }
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EMAIL DRAFT — Summary Aging
+// ─────────────────────────────────────────────────────────────────────────────
+let _emailCustomer = null;
+let _emailInvoices = [];
+
+function _currSym(cur) {
+  if(cur==='USD') return '$';
+  if(cur==='EUR') return '€';
+  return '£';
+}
+
+function _fmtCurrency(sym, n) {
+  return sym + Number(n||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAYMENT TERM HELPERS (email draft only)
+// ─────────────────────────────────────────────────────────────────────────────
+function _getPaymentTermDays(termsStr) {
+  if (!termsStr) return 30; // default
+  var t = termsStr.toUpperCase().trim();
+  if (/MID.*(END|MONTH)|END.*(MID|MONTH)|SEMI/i.test(t)) return -1; // special: mid+end month
+  var m = t.match(/(\d+)\s*DAY/i);
+  if (m) return parseInt(m[1]);
+  if (/14/.test(t)) return 14;
+  if (/30/.test(t)) return 30;
+  if (/60/.test(t)) return 60;
+  return 30;
+}
+
+function _classifyInvoice(inv, paymentTermDays) {
+  // Returns: 'overdue' | 'becoming_due' | 'not_due' | 'credit'
+  if (isCredit(inv.docType)) return 'credit';
+  if (!inv.dueDate) return 'not_due';
+  var now = TODAY.getTime();
+  var due = inv.dueDate.getTime();
+  var daysToDue = Math.round((due - now) / 86400000);
+
+  if (paymentTermDays === -1) {
+    // Mid and end of month logic
+    // Invoice can be paid up to the 15th of the due month (mid) or end of month
+    var dueMonth = inv.dueDate.getMonth();
+    var dueYear = inv.dueDate.getFullYear();
+    var midOfMonth = new Date(dueYear, dueMonth, 15).getTime();
+    var endOfMonth = new Date(dueYear, dueMonth + 1, 0).getTime();
+    if (now > endOfMonth) return 'overdue';
+    if (now > midOfMonth) return now > due ? 'becoming_due' : 'not_due';
+    return 'not_due';
+  }
+
+  if (now > due) {
+    // Past due date - truly overdue
+    return 'overdue';
+  }
+  // Within 10 days of due date - becoming due
+  if (daysToDue <= 10) return 'becoming_due';
+  return 'not_due';
+}
+
+function openEmailDraft(ci) {
+  const c = typeof ci === 'object' ? ci : (window._odSorted||[])[ci];
+  if (!c) return;
+  _emailCustomer = c;
+  _emailInvoices = [];
+
+  const sym = _currSym(c.currency);
+  document.getElementById('edraft-cname').textContent = c.name;
+  document.getElementById('edraft-overdue').textContent = _fmtCurrency(sym, c.overdueAmount);
+
+  // Auto-fill contact email if known
+  const knownEmail = _lookupContact(c.name);
+  const toInput = document.getElementById('edraft-to');
+  const hintEl = document.getElementById('edraft-contact-hint');
+  if (toInput) {
+    toInput.value = knownEmail;
+    if (knownEmail) {
+      toInput.style.borderColor = 'var(--green-mid)';
+      toInput.style.background = 'var(--green-bg)';
+      if (hintEl) hintEl.textContent = '✅ Found in Gmail contacts';
+      if (hintEl) hintEl.style.color = 'var(--green)';
+    } else {
+      toInput.style.borderColor = '';
+      toInput.style.background = '';
+      if (hintEl) hintEl.textContent = _gmailToken ? '○ Not in contacts yet — type manually' : '○ Connect Gmail to auto-fill contacts';
+      if (hintEl) hintEl.style.color = 'var(--text3)';
+    }
+  }
+
+  // Reset statement upload zone
+  const zone = document.getElementById('edraft-stmt-zone');
+  zone.className = 'uz';
+  document.getElementById('edraft-stmt-icon').textContent = '📄';
+  document.getElementById('edraft-stmt-title').textContent = 'Upload Customer Statement PDF';
+  document.getElementById('edraft-stmt-sub').textContent = 'Click or drag — the invoice table will be inserted into the email';
+  document.getElementById('edraft-stmt-file').textContent = '';
+  document.getElementById('edraft-stmt-input').value = '';
+
+  _buildEmailPreview(c, []);
+  document.getElementById('edraft-modal').style.display = 'flex';
+}
+
+function closeEmailDraft() {
+  document.getElementById('edraft-modal').style.display = 'none';
+  _emailCustomer = null;
+  _emailInvoices = [];
+  _emailStmtBase64 = null;
+  _emailStmtFileName = '';
+}
+
+async function handleEmailStmtUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  // Also add to global stmt collection if not already there
+  if (!S.stmtFiles) S.stmtFiles = [];
+  if (!S.stmtFiles.includes(file.name)) {
+    // Parse and accumulate
+    const newInvs = await parseCustomerStatementPDF(file).catch(()=>[]);
+    if (newInvs.length) {
+      const existingNums = new Set(S.stmtInvoices.map(i=>i.docNo));
+      S.stmtInvoices = [...S.stmtInvoices, ...newInvs.filter(i=>!existingNums.has(i.docNo))];
+      S.stmtFiles.push(file.name);
+      saveStmtToStorage(S.stmtInvoices, S.stmtFiles.join(', '));
+      try { localStorage.setItem('nwi_stmt_files', JSON.stringify(S.stmtFiles)); } catch(e) {}
+      renderStmtFileList();
+      updateReadiness();
+    }
+  }
+  const zone = document.getElementById('edraft-stmt-zone');
+  zone.className = 'uz';
+  document.getElementById('edraft-stmt-icon').textContent = '⏳';
+  document.getElementById('edraft-stmt-title').textContent = 'Parsing statement…';
+  document.getElementById('edraft-stmt-sub').textContent = file.name;
+
+  try {
+    const invoices = await parseCustomerStatementPDF(file);
+    _emailInvoices = invoices;
+    // Store as base64 for Gmail attachment
+    const reader = new FileReader();
+    reader.onload = e => { _emailStmtBase64 = e.target.result.split(',')[1]; _emailStmtFileName = file.name; };
+    reader.readAsDataURL(file);
+    zone.className = 'uz ok';
+    document.getElementById('edraft-stmt-icon').textContent = '✅';
+    document.getElementById('edraft-stmt-title').textContent = '✅ ' + file.name;
+    document.getElementById('edraft-stmt-sub').textContent = invoices.length + ' invoice rows found';
+    document.getElementById('edraft-stmt-file').textContent = (file.size/1024).toFixed(0) + ' KB · PDF';
+    _buildEmailPreview(_emailCustomer, invoices);
+    toast('ok', 'Statement parsed', invoices.length + ' rows found — email updated');
+  } catch(e) {
+    zone.className = 'uz';
+    document.getElementById('edraft-stmt-icon').textContent = '❌';
+    document.getElementById('edraft-stmt-title').textContent = 'Error reading statement';
+    document.getElementById('edraft-stmt-sub').textContent = e.message;
+    toast('err', 'Could not parse statement', e.message);
+  }
+}
+
+function _buildEmailPreview(c, invoices) {
+  const sym = _currSym(c.currency);
+  const remNums = new Set(); S.remittances.forEach(r=>r.invoices.forEach(i=>{if(i)remNums.add(i.trim().toLowerCase());}));
+  // Exclude invoices covered by remittance and credit docs — these are not outstanding
+  const outstanding = invoices.filter(inv => {
+    if (isCredit(inv.docType)) return false;
+    if (remNums.has((inv.docNo||'').toLowerCase())) return false;
+    return inv.amount > 0;
+  });
+
+  // Check if this customer has any enquiries with invoice numbers (17...)
+  const custEnqs = S.enquiries.filter(e =>
+    e.customer.toLowerCase().includes(c.name.toLowerCase().split(' ')[0]) ||
+    c.name.toLowerCase().includes(e.customer.toLowerCase().split(' ')[0])
+  );
+  const enqInvoices = custEnqs
+    .flatMap(e => (e.invoices||'').split(/[,\s]+/).map(i=>i.trim()).filter(i=>/^17\d+$/.test(i)))
+    .filter((v,i,a)=>a.indexOf(v)===i);
+
+  const enquiryLine = enqInvoices.length
+    ? `\nWe are aware of invoice ${enqInvoices.join(', ')} — we are currently dealing with this enquiry. For all other invoices, please update us on the expected payment.\n`
+    : '';
+
+  // Use GENUINELY OVERDUE total (past due date only) for the amount in the email body.
+  // The invoice TABLE below shows all outstanding — but the headline figure must only
+  // reflect what is actually past due, consistent with the Summary Aging figure.
+  const genuinelyOverdue = outstanding.filter(inv => inv.dueDate && inv.dueDate < TODAY);
+  const effectiveOverdue = genuinelyOverdue.length > 0
+    ? genuinelyOverdue.reduce((s,inv)=>s+inv.amount,0)
+    : 0;
+  // Fallback: use the overdueAmount from Summary Aging (col4+col5+col6) when no statement
+  const overdueStr = effectiveOverdue > 0
+    ? _fmtCurrency(sym, effectiveOverdue)
+    : _fmtCurrency(sym, c.overdueAmount);
+
+  // Payment-term-aware tone selection
+  var arCust = S.arCustomers.find(function(a){return a.name===c.name||a.code===c.code;});
+  var payTermDays = arCust ? _getPaymentTermDays(arCust.paymentTerms) : 30;
+  var hasBecomingDue = outstanding.some(function(inv){return _classifyInvoice(inv,payTermDays)==='becoming_due';});
+  var hasTrulyOverdue = outstanding.some(function(inv){return _classifyInvoice(inv,payTermDays)==='overdue';});
+  var payTermLabel = arCust && arCust.paymentTerms ? arCust.paymentTerms : '';
+
+  var part1, part2;
+  if (outstanding.length === 0) {
+    part1 = 'Dear '+c.name+' Team,\n\nHope this email finds you well,\n\nPlease note you have invoices on the account which will require attention. Please see below for details.';
+    part2 = (enquiryLine||'') + '\nIf you have any questions, please do not hesitate to contact us.\n\nYour statement on account is attached for your reference.\n\nThanks & Regards\nPavi';
+  } else if (hasTrulyOverdue && !hasBecomingDue) {
+    // All overdue - firm tone
+    part1 = 'Dear '+c.name+' Team,\n\nHope this email finds you well,\n\nPlease note you have invoices overdue on the account, amounting to approx '+overdueStr+' in overdue invoices. Please see below all the invoices which require urgent attention to clear from the accounts.';
+    part2 = (enquiryLine||'') + '\nIf there are any inquiries regarding any of the invoices, please kindly update us regarding each invoice under query. For the invoices not under query, please kindly update me with the payment date and funds included in the next payment to clear all the overdue invoices on the account as its urgent.\n\nYour statement on account is attached for your reference.\n\nThanks & Regards\nPavi';
+  } else if (hasBecomingDue && !hasTrulyOverdue) {
+    // All becoming due - soft, courteous tone
+    part1 = 'Dear '+c.name+' Team,\n\nHope this email finds you well,\n\nI hope you are doing well. I wanted to reach out as we have some invoices on your account that are approaching their due date'+(payTermLabel?' ('+payTermLabel+' terms)':'')+'\n\nPlease see the invoices below which will be due for payment shortly.';
+    part2 = (enquiryLine||'') + '\nWe would be grateful if you could arrange payment at your earliest convenience in line with your payment terms. If you have already arranged this, please disregard this message.\n\nYour statement on account is attached for your reference.\n\nThanks & Regards\nPavi';
+  } else {
+    // Mix: some overdue, some becoming due
+    part1 = 'Dear '+c.name+' Team,\n\nHope this email finds you well,\n\nPlease note you have invoices on your account which require attention. Some invoices are now overdue and others are approaching their due date shortly. The total overdue amount is approx '+overdueStr+'.\n\nPlease see the invoice details below.';
+    part2 = (enquiryLine||'') + '\nFor invoices that are overdue, please kindly confirm the expected payment date and amounts included in the next payment. For invoices that are becoming due, please ensure payment is arranged in line with your agreed payment terms'+(payTermLabel?' ('+payTermLabel+')':'')+'\n\nYour statement on account is attached for your reference.\n\nThanks & Regards\nPavi';
+  }
+
+  document.getElementById('edraft-part1').textContent = part1;
+  document.getElementById('edraft-part2').textContent = part2;
+
+  if (outstanding.length > 0) {
+    const total = outstanding.reduce((s,inv)=>s+inv.amount,0);
+    const totalStr = _fmtCurrency(sym, total);
+    const tableHTML = `<table style="border-collapse:collapse;width:100%;font-size:12px;margin:12px 0;font-family:'Plus Jakarta Sans',sans-serif">
+      <thead><tr>
+        <th style="text-align:left;padding:10px 14px;background:#3b1f0a;border:1px solid #3b1f0a;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700">Invoice No.</th>
+        <th style="text-align:left;padding:10px 14px;background:#3b1f0a;border:1px solid #3b1f0a;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700">Ext. Doc No.</th>
+        <th style="text-align:left;padding:10px 14px;background:#3b1f0a;border:1px solid #3b1f0a;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700">Doc Type</th>
+        <th style="text-align:left;padding:10px 14px;background:#3b1f0a;border:1px solid #3b1f0a;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700">Due Date</th>
+        <th style="text-align:right;padding:10px 14px;background:#3b1f0a;border:1px solid #3b1f0a;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700">Amount</th>
+      </tr></thead>
+      <tbody>${outstanding.map((inv,ri)=>`<tr style="background:${(()=>{const cls=_classifyInvoice(inv,payTermDays);return cls==='overdue'?'#fef2f2':cls==='becoming_due'?'#fffbeb':'#ffffff';})()}">
+        <td style="padding:7px 12px;border:1px solid #e8d5c4;font-family:'DM Mono',monospace;font-size:11px;font-weight:600">${escH(inv.docNo||'—')}</td>
+        <td style="padding:7px 12px;border:1px solid #e8d5c4;font-size:11px;color:#7a6050">${escH(inv.extDocNo||'—')}</td>
+        <td style="padding:7px 12px;border:1px solid #e8d5c4;font-size:11px">${escH(inv.docType||'Invoice')}</td>
+        <td style="padding:7px 12px;border:1px solid #e8d5c4;font-size:11px;${inv.dueDate&&inv.dueDate<TODAY?'color:var(--red);font-weight:700':''}">${fmtDate(inv.dueDate)}</td>
+        <td style="padding:7px 12px;border:1px solid #e8d5c4;text-align:right;font-weight:600">${escH(_fmtCurrency(sym,inv.amount))}</td>
+      </tr>`).join('')}
+      <tr style="background:var(--surface3)">
+        <td colspan="4" style="padding:10px 14px;border:1px solid #3b1f0a;background:#3b1f0a;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#f5ede3">Total Outstanding</td>
+        <td style="padding:10px 14px;border:1px solid #3b1f0a;background:#3b1f0a;text-align:right;font-weight:700;font-size:14px;color:#f5ede3">${escH(totalStr)}</td>
+      </tr></tbody></table>`;
+    document.getElementById('edraft-table-html').innerHTML = tableHTML;
+  } else {
+    document.getElementById('edraft-table-html').innerHTML = '<div style="font-size:12px;color:var(--text3);padding:6px 0;font-style:italic">[Upload the customer statement above to auto-populate the invoice table here]</div>';
+  }
+
+  // Build plain-text version for clipboard
+  let plainTable = '';
+  if (outstanding.length > 0) {
+    const rows = outstanding.map(inv => [
+      inv.docNo||'—', inv.extDocNo||'—', inv.docType||'Invoice',
+      fmtDate(inv.dueDate), _fmtCurrency(sym,inv.amount)
+    ]);
+    const headers = ['Invoice No.','Ext. Doc No.','Doc Type','Due Date','Amount'];
+    const widths = headers.map((h,i) => Math.max(h.length, ...rows.map(r=>r[i].length)));
+    const sep = '+' + widths.map(w=>'-'.repeat(w+2)).join('+') + '+';
+    const rowLine = cells => '| ' + cells.map((c,i)=>c.padEnd(widths[i])).join(' | ') + ' |';
+    plainTable = '\n\n' + sep + '\n' + rowLine(headers) + '\n' + sep + '\n' +
+      rows.map(r=>rowLine(r)).join('\n') + '\n' + sep +
+      '\n\nTotal Outstanding: ' + _fmtCurrency(sym, outstanding.reduce((s,i)=>s+i.amount,0)) + '\n\n';
+  } else {
+    plainTable = '\n\n';
+  }
+
+  const fullPlain = part1 + plainTable + part2;
+  document.getElementById('edraft-modal').dataset.plain = fullPlain;
+}
+
+function copyEmailDraft() {
+  const text = document.getElementById('edraft-modal').dataset.plain || '';
+  if (!text) { toast('warn','Nothing to copy','Open an email draft first'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    toast('ok','Email copied','Paste into your email client');
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GMAIL INTEGRATION
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// GMAIL CONTACTS — auto-fetch external email addresses from inbox/sent
+// ─────────────────────────────────────────────────────────────────────────────
+let _contactsCache = {};  // { 'Customer Name Lower': 'email@customer.com' }
+
+function _loadContactsFromStorage() {
+  try {
+    const raw = localStorage.getItem('nwi_contacts');
+    if (raw) _contactsCache = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function _saveContactsToStorage() {
+  try { localStorage.setItem('nwi_contacts', JSON.stringify(_contactsCache)); } catch(e) {}
+}
+
+// Fetch contacts from Gmail after connecting
+async function fetchGmailContacts(token) {
+  if (!token) return;
+  try {
+    // Search for messages NOT from our domain — these are external customers
+    const resp = await fetch(
+      'https://gmail.googleapis.com/gmail/v1/users/me/messages?q=-from:@newwayinternational.co.uk+-from:@newwayinternational.com&maxResults=50',
+      { headers: { 'Authorization': 'Bearer ' + token } }
+    );
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const messages = data.messages || [];
+    
+    // Fetch headers for each message to get From/To addresses
+    const fetches = messages.slice(0, 30).map(m =>
+      fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Reply-To`,
+        { headers: { 'Authorization': 'Bearer ' + token } }
+      ).then(r => r.ok ? r.json() : null).catch(() => null)
+    );
+    const results = await Promise.all(fetches);
+    let found = 0;
+    results.forEach(msg => {
+      if (!msg) return;
+      const headers = (msg.payload || {}).headers || [];
+      headers.forEach(h => {
+        if (!['From','Reply-To'].includes(h.name)) return;
+        // Extract email addresses that are NOT ours
+        const matches = h.value.match(/[\w.+-]+@[\w.-]+\.\w+/g) || [];
+        matches.forEach(email => {
+          if (/@newwayinternational/i.test(email)) return;
+          // Try to extract a clean domain/name key
+          const domain = email.split('@')[1].split('.')[0].toLowerCase();
+          const existing = Object.keys(_contactsCache).find(k => k.includes(domain) || domain.includes(k.split(' ')[0]));
+          if (!existing) {
+            // Store under domain key — will be matched to customer later
+            _contactsCache[domain] = email;
+            found++;
+          }
+        });
+      });
+    });
+    if (found > 0) {
+      _saveContactsToStorage();
+      toast('ok', `${found} contacts found`, 'Email addresses will auto-fill in drafts');
+    }
+  } catch(e) {}
+}
+
+// Look up a contact email for a customer name
+function _lookupContact(customerName) {
+  if (!customerName) return '';
+  const nameLower = customerName.toLowerCase();
+  // Direct match
+  if (_contactsCache[nameLower]) return _contactsCache[nameLower];
+  // Partial match — try each word in customer name
+  const words = nameLower.split(/\s+/).filter(w => w.length > 3);
+  for (const word of words) {
+    const key = Object.keys(_contactsCache).find(k => k.includes(word) || word.includes(k));
+    if (key) return _contactsCache[key];
+  }
+  return '';
+}
+
+// Manually save a contact when user types an email in the draft
+function _saveContactFromDraft(customerName, email) {
+  if (!customerName || !email || !email.includes('@')) return;
+  if (/@newwayinternational/i.test(email)) return;
+  const key = customerName.toLowerCase();
+  _contactsCache[key] = email.trim();
+  _saveContactsToStorage();
+}
+
+function gmailConnect() {
+  const clientId = (document.getElementById('gmail-client-id')||{}).value||'';
+  if (!clientId.trim()) { toast('warn','Client ID required','Enter your Google OAuth Client ID first'); return; }
+  if (typeof google === 'undefined' || !google.accounts) {
+    toast('err','Google not loaded','Try refreshing the page'); return;
+  }
+  localStorage.setItem('nwi_gmail_client_id', clientId.trim());
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: clientId.trim(),
+    scope: 'https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/gmail.readonly',
+    callback: (resp) => {
+      if (resp.error) { toast('err','Gmail auth failed', resp.error); return; }
+      _gmailToken = resp.access_token;
+      const gmailStatusEl = document.getElementById('gmail-status');
+      if (gmailStatusEl) { gmailStatusEl.textContent = '✅ Gmail connected'; gmailStatusEl.style.color = 'var(--green)'; }
+      const btn = document.getElementById('gmail-connect-btn');
+      if (btn) btn.textContent = '🔄 Reconnect Gmail';
+      toast('ok','Gmail connected','Fetching customer contacts from inbox…');
+      fetchGmailContacts(resp.access_token);
+    }
+  });
+  client.requestAccessToken();
+}
+
+function gmailDisconnect() {
+  _gmailToken = null;
+  const gmailStatusEl = document.getElementById('gmail-status');
+  if (gmailStatusEl) { gmailStatusEl.textContent = '○ Not connected'; gmailStatusEl.style.color = 'var(--text3)'; }
+  toast('ok','Gmail disconnected','');
+}
+
+function _buildEmailHtml(c, invoices) {
+  const sym = _currSym(c.currency);
+  const remNums = new Set(); S.remittances.forEach(r=>r.invoices.forEach(i=>{if(i)remNums.add(i.trim().toLowerCase());}));
+  // Exclude remitted invoices and credit docs
+  const outstanding = invoices.filter(inv => {
+    if (isCredit(inv.docType)) return false;
+    if (remNums.has((inv.docNo||'').toLowerCase())) return false;
+    return inv.amount > 0;
+  });
+  const genuinelyOverdue2 = outstanding.filter(inv => inv.dueDate && inv.dueDate < TODAY);
+  const effectiveOverdue = genuinelyOverdue2.length > 0
+    ? genuinelyOverdue2.reduce((s,inv)=>s+inv.amount,0)
+    : 0;
+  const overdueStr = effectiveOverdue > 0
+    ? _fmtCurrency(sym, effectiveOverdue)
+    : _fmtCurrency(sym, c.overdueAmount);
+
+  const custEnqs = S.enquiries.filter(e =>
+    e.customer.toLowerCase().includes(c.name.toLowerCase().split(' ')[0]) ||
+    c.name.toLowerCase().includes(e.customer.toLowerCase().split(' ')[0])
+  );
+  const enqInvoices = custEnqs
+    .flatMap(e => (e.invoices||'').split(/[,\s]+/).map(i=>i.trim()).filter(i=>/^17\d+$/.test(i)))
+    .filter((v,i,a)=>a.indexOf(v)===i);
+  const enquiryHtml = enqInvoices.length
+    ? `<p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1e293b;margin:0 0 14px 0;line-height:1.7">We are aware of invoice ${enqInvoices.join(', ')} — we are currently dealing with this enquiry. For all other invoices, please update us on the expected payment.</p>`
+    : '';
+
+  let tableHtml = '';
+  if (outstanding.length > 0) {
+    const total = outstanding.reduce((s,inv)=>s+inv.amount,0);
+    const totalStr = _fmtCurrency(sym, total);
+    const thS = 'padding:10px 14px;background:#3b1f0a;border:1px solid #3b1f0a;font-family:Arial,Helvetica,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700';
+    tableHtml = `<table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin:16px 0">
+      <thead><tr>
+        <th align="left" style="${thS}">Invoice No.</th>
+        <th align="left" style="${thS}">Ext. Doc No.</th>
+        <th align="left" style="${thS}">Doc Type</th>
+        <th align="left" style="${thS}">Due Date</th>
+        <th align="right" style="${thS}">Amount</th>
+      </tr></thead>
+      <tbody>${outstanding.map(inv => {
+        const isOD = inv.dueDate && inv.dueDate < TODAY;
+        const rowBg = isOD ? '#fef2f2' : '#ffffff';
+        return `<tr>
+          <td style="padding:8px 12px;border:1px solid #e0cfc0;font-family:'Courier New',Courier,monospace;font-size:12px;font-weight:600;background:${rowBg}">${inv.docNo||'—'}</td>
+          <td style="padding:8px 12px;border:1px solid #e0cfc0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6b5040;background:${rowBg}">${inv.extDocNo||'—'}</td>
+          <td style="padding:8px 12px;border:1px solid #e0cfc0;font-family:Arial,Helvetica,sans-serif;font-size:12px;background:${rowBg}">${inv.docType||'Invoice'}</td>
+          <td style="padding:8px 12px;border:1px solid #e0cfc0;font-family:Arial,Helvetica,sans-serif;font-size:12px;background:${rowBg};color:${isOD?'#dc2626':'#1e293b'};font-weight:${isOD?700:400}">${fmtDate(inv.dueDate)}</td>
+          <td align="right" style="padding:8px 14px;border:1px solid #e0cfc0;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;background:${rowBg};color:${isOD?'#dc2626':'#3b2010'}">${_fmtCurrency(sym,inv.amount)}</td>
+        </tr>`;
+      }).join('')}
+      <tr>
+        <td colspan="4" style="padding:10px 14px;border:1px solid #3b1f0a;background:#3b1f0a;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#f5ede3">Total Outstanding</td>
+        <td align="right" style="padding:10px 14px;border:1px solid #3b1f0a;background:#3b1f0a;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:14px;color:#f5ede3">${totalStr}</td>
+      </tr>
+      </tbody>
+    </table>`;
+  }
+
+  const pS = 'font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1e293b;margin:0 0 14px 0;line-height:1.7';
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:20px;background:#ffffff">
+<p style="${pS}">Dear ${c.name} Team,</p>
+<p style="${pS}">Hope this email finds you well,</p>
+<p style="${pS}">Please note you have invoices overdue on the account, amounting to approx <strong>${overdueStr}</strong> in overdue invoices. Please see below all the invoices which require urgent attention to clear from the accounts.</p>
+${tableHtml}
+${enquiryHtml}
+<p style="${pS}">If there are any inquiries regarding any of the invoices, please kindly update us regarding each invoice under query. For the invoices not under query, please kindly update me with the payment date and funds included in the next payment to clear all the overdue invoices on the account as its urgent.</p>
+<p style="${pS}">Your statement on account is attached for your reference.</p>
+<p style="${pS}">Thanks &amp; Regards<br>Pavi</p>
+</body></html>`;
+}
+
+async function createGmailDraft() {
+  if (!_gmailToken) {
+    toast('warn','Gmail not connected','Connect Gmail via the header button first');
+    return;
+  }
+  if (!_emailCustomer) { toast('warn','No email content','Generate an email draft first'); return; }
+
+  const subject = 'URGENT:- Overdue Balance Enquiry';
+  const boundary = 'nwi_boundary_' + Math.random().toString(36).slice(2);
+  const htmlBody = _buildEmailHtml(_emailCustomer, _emailInvoices);
+
+  // Build MIME message
+  const toEmail = (document.getElementById('edraft-to')||{}).value||'';
+  // Save contact for next time
+  if (toEmail && _emailCustomer) _saveContactFromDraft(_emailCustomer.name, toEmail);
+
+  let mime = [
+    'MIME-Version: 1.0',
+    `To: ${toEmail}`,
+    `Subject: ${subject}`,
+  ];
+
+  const attachmentBase64 = _emailStmtBase64 || _stmtBase64;
+  const attachmentName = _emailStmtFileName || _stmtFileName || 'CustomerStatement.pdf';
+
+  if (attachmentBase64) {
+    mime.push(`Content-Type: multipart/mixed; boundary="${boundary}"`);
+    mime.push('');
+    mime.push(`--${boundary}`);
+    mime.push('Content-Type: text/html; charset="UTF-8"');
+    mime.push('');
+    mime.push(htmlBody);
+    mime.push('');
+    mime.push(`--${boundary}`);
+    mime.push('Content-Type: application/pdf');
+    mime.push('Content-Transfer-Encoding: base64');
+    mime.push(`Content-Disposition: attachment; filename="${attachmentName}"`);
+    mime.push('');
+    mime.push(attachmentBase64);
+    mime.push(`--${boundary}--`);
+  } else {
+    mime.push('Content-Type: text/html; charset="UTF-8"');
+    mime.push('');
+    mime.push(htmlBody);
+  }
+
+  const raw = mime.join('\r\n');
+  // Encode to base64url
+  const encoded = btoa(unescape(encodeURIComponent(raw)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+  try {
+    const resp = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/drafts', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + _gmailToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: { raw: encoded } })
+    });
+    if (resp.ok) {
+      toast('ok', 'Gmail draft created', 'Check your Gmail Drafts — add the recipient and send');
+    } else {
+      const err = await resp.json().catch(()=>({error:{message:'Unknown error'}}));
+      if (resp.status === 401) {
+        _gmailToken = null;
+        const gmailStatusEl = document.getElementById('gmail-status');
+        if (gmailStatusEl) { gmailStatusEl.textContent = '○ Token expired — reconnect'; gmailStatusEl.style.color = 'var(--amber)'; }
+        toast('warn','Gmail token expired','Reconnect Gmail and try again');
+      } else {
+        toast('err', 'Gmail error', (err.error||{}).message || resp.status);
+      }
+    }
+  } catch(e) {
+    toast('err', 'Gmail request failed', e.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REMITTANCE CHASE EMAIL
+// ─────────────────────────────────────────────────────────────────────────────
+let _remEmailData = null; // { custName, overdueInvs, queryInvs, sym }
+
+function openRemittanceEmailDraft(ci) {
+  const entries = window._mrCustEntries||[];
+  const entry = entries[ci];
+  if (!entry) return;
+  const [name, invs] = entry;
+
+  const overdueInvs = invs.filter(i=>i.isOverdue);
+  const queryInvs   = invs.filter(i=>i.isUnderQuery && !i.isOverdue);
+  if (!overdueInvs.length) return;
+
+  // Use the remittance customer name directly — that's what Pavi entered
+  // Optionally enrich with AR full name if a close match exists
+  const ar = S.arCustomers.find(function(a) {
+    var nLow = name.toLowerCase();
+    var aLow = a.name.toLowerCase();
+    return a.name===name||a.code===name||aLow.includes(nLow.split(' ').find(function(w){return w.length>3;})||nLow)||nLow.includes(aLow.split(' ').find(function(w){return w.length>3;})||aLow);
+  });
+  // Prefer the remittance name (what Pavi typed) over AR name to keep it accurate
+  const displayName = name;
+  // Get currency from AR record if available
+  const sym = ar ? _currSym(ar.currency) : '£';
+  const totalOD = overdueInvs.reduce((s,i)=>s+i.amount,0);
+
+  _remEmailData = { custName: name, displayName, overdueInvs, queryInvs, sym };
+
+  document.getElementById('rem-email-cname').textContent = displayName;
+  document.getElementById('rem-email-overdue').textContent = _fmtCurrency(sym, totalOD);
+
+  // Auto-fill contact
+  const knownEmail = _lookupContact(displayName);
+  const toInput = document.getElementById('rem-email-to');
+  const hintEl  = document.getElementById('rem-email-contact-hint');
+  toInput.value = knownEmail;
+  if (knownEmail) {
+    toInput.style.borderColor = 'var(--green-mid)';
+    toInput.style.background  = 'var(--green-bg)';
+    if (hintEl) { hintEl.textContent = '✅ Found in contacts'; hintEl.style.color='var(--green)'; }
+  } else {
+    toInput.style.borderColor = '';
+    toInput.style.background  = '';
+    if (hintEl) { hintEl.textContent = '○ Type email manually'; hintEl.style.color='var(--text3)'; }
+  }
+
+  _buildRemittanceEmailPreview(_remEmailData);
+  document.getElementById('rem-email-modal').style.display = 'flex';
+}
+
+function closeRemittanceEmailDraft() {
+  document.getElementById('rem-email-modal').style.display = 'none';
+  _remEmailData = null;
+}
+
+function _buildRemittanceEmailPreview(data) {
+  const { displayName, overdueInvs, queryInvs, sym } = data;
+  const enqInvNums = new Set(queryInvs.map(function(i){ return (i.docNo||'').toLowerCase(); }));
+  const thBg = '#3b1f0a';
+  const thStyle = 'padding:10px 14px;background:'+thBg+';border:1px solid '+thBg+';font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700;font-family:sans-serif';
+  const totalOD = overdueInvs.reduce(function(s,i){ return s+i.amount; }, 0);
+
+  let tableRows = '';
+  overdueInvs.forEach(function(inv) {
+    const isUQ = enqInvNums.has((inv.docNo||'').toLowerCase());
+    const rowBg = isUQ ? '#fffbeb' : '#ffffff';
+    const bc = isUQ ? '#fde68a' : '#e0cfc0';
+    const td = function(content, extra) { return '<td style="padding:8px 12px;border:1px solid '+bc+';font-size:11px;background:'+rowBg+';'+(extra||'')+'">' + content + '</td>'; };
+    tableRows += '<tr>';
+    tableRows += td(escH(inv.docNo||'—'), 'font-family:monospace;font-weight:600');
+    tableRows += td(escH(inv.extDocNo||'—'), 'color:var(--text3)');
+    tableRows += td(escH(inv.docType||'Invoice'), '');
+    tableRows += td(fmtDate(inv.dueDate), 'color:var(--red);font-weight:700');
+    tableRows += td(escH(_fmtCurrency(sym,inv.amount)), 'font-weight:700;text-align:right;color:var(--red)');
+    tableRows += td(isUQ ? '🟡 Under Query' : '', isUQ ? 'color:#92600e;font-weight:700' : 'color:var(--text3)');
+    tableRows += '</tr>';
+  });
+
+  const tableHTML = '<table style="border-collapse:collapse;width:100%;font-size:12px;margin:10px 0">'
+    + '<thead><tr>'
+    + '<th align="left" style="'+thStyle+'">Invoice No.</th>'
+    + '<th align="left" style="'+thStyle+'">Ext. Doc No.</th>'
+    + '<th align="left" style="'+thStyle+'">Doc Type</th>'
+    + '<th align="left" style="'+thStyle+'">Due Date</th>'
+    + '<th align="right" style="'+thStyle+'">Amount</th>'
+    + '<th align="left" style="'+thStyle+'">Status</th>'
+    + '</tr></thead>'
+    + '<tbody>' + tableRows + '</tbody>'
+    + '<tfoot><tr>'
+    + '<td colspan="4" style="padding:10px 14px;background:'+thBg+';border:1px solid '+thBg+';font-weight:700;font-size:11px;text-transform:uppercase;color:#f5ede3;font-family:sans-serif">Total Overdue (excl. remittance)</td>'
+    + '<td style="padding:10px 14px;background:'+thBg+';border:1px solid '+thBg+';font-weight:700;font-size:14px;text-align:right;color:#f5ede3;font-family:sans-serif">' + escH(_fmtCurrency(sym,totalOD)) + '</td>'
+    + '<td style="background:'+thBg+';border:1px solid '+thBg+'"></td>'
+    + '</tr></tfoot></table>';
+
+  const underQueryNote = queryInvs.length
+    ? '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;font-size:12px;color:#92600e;font-weight:500;margin:8px 0">🟡 Rows highlighted in yellow are invoices we are aware are under query — no update needed on those.</div>'
+    : '';
+
+  const previewEl = document.getElementById('rem-email-preview');
+    var _emailOpening = 'Hi ' + escH(displayName) + ' Team,\n\nThank you for the remittance sent,\n\nPlease could you update us regarding the overdue invoices, which is not included in the remittance? If there is invoices under query, please note they are highlighted in yellow for us to process and resolve on our end. No need to update us on those invoices. Please see the table below.';
+  var _emailClosing = 'If there is any new inquiries on the invoices outstanding, please kindly update us.\nIf you have any questions please let us know.\n\nThanks &amp; Regards\nPavi';
+  previewEl.innerHTML = '<div style="white-space:pre-wrap;font-family:Plus Jakarta Sans,sans-serif;margin-bottom:8px">' + _emailOpening + '</div>' + tableHTML + underQueryNote + '<div style="white-space:pre-wrap;font-family:Plus Jakarta Sans,sans-serif;margin-top:8px">' + _emailClosing + '</div>';
+
+  const rows = overdueInvs.map(function(inv) {
+    const isUQ = enqInvNums.has((inv.docNo||'').toLowerCase());
+    return (inv.docNo||'—') + ' | ' + (inv.extDocNo||'—') + ' | ' + fmtDate(inv.dueDate) + ' | ' + _fmtCurrency(sym,inv.amount) + (isUQ?' [UNDER QUERY]':'');
+  }).join('\n');
+  data._plainText = 'Hi ' + displayName + ' Team,\n\nThank you for the remittance sent,\n\nPlease could you update us regarding the overdue invoices, which is not included in the remittance? If there is invoices under query, please note they are highlighted in yellow for us to process and resolve on our end. No need to update us on those invoices. Please see the table below.\n\n' + rows + '\n\nTotal Overdue (excl. remittance): ' + _fmtCurrency(sym,totalOD) + '\n\nIf there is any new inquiries on the invoices outstanding, please kindly update us.\nIf you have any questions please let us know.\n\nThanks & Regards\nPavi';
+}
+
+
+function _buildRemittanceEmailHtml(data) {
+  const { displayName, overdueInvs, queryInvs, sym } = data;
+  const enqInvNums = new Set(queryInvs.map(function(i){ return (i.docNo||'').toLowerCase(); }));
+  const thBg = '#3b1f0a';
+  const thS = 'padding:10px 14px;background:'+thBg+';border:1px solid '+thBg+';font-family:Arial,Helvetica,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#f5ede3;font-weight:700';
+  const pS = 'font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1e293b;margin:0 0 14px 0;line-height:1.7';
+  const totalOD = overdueInvs.reduce(function(s,i){ return s+i.amount; }, 0);
+
+  let tableRows = '';
+  overdueInvs.forEach(function(inv) {
+    const isUQ = enqInvNums.has((inv.docNo||'').toLowerCase());
+    const rowBg = isUQ ? '#fffbeb' : '#ffffff';
+    const bc = isUQ ? '#fde68a' : '#e0cfc0';
+    tableRows += '<tr>';
+    tableRows += '<td style="padding:8px 12px;border:1px solid '+bc+';font-family:Courier New,Courier,monospace;font-size:12px;font-weight:600;background:'+rowBg+'">'+(inv.docNo||'—')+'</td>';
+    tableRows += '<td style="padding:8px 12px;border:1px solid '+bc+';font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6b5040;background:'+rowBg+'">'+(inv.extDocNo||'—')+'</td>';
+    tableRows += '<td style="padding:8px 12px;border:1px solid '+bc+';font-family:Arial,Helvetica,sans-serif;font-size:12px;background:'+rowBg+'">'+(inv.docType||'Invoice')+'</td>';
+    tableRows += '<td style="padding:8px 12px;border:1px solid '+bc+';font-family:Arial,Helvetica,sans-serif;font-size:12px;background:'+rowBg+';color:#dc2626;font-weight:700">'+fmtDate(inv.dueDate)+'</td>';
+    tableRows += '<td align="right" style="padding:8px 14px;border:1px solid '+bc+';font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;background:'+rowBg+';color:#dc2626">'+_fmtCurrency(sym,inv.amount)+'</td>';
+    tableRows += '<td style="padding:8px 12px;border:1px solid '+bc+';font-family:Arial,Helvetica,sans-serif;font-size:11px;background:'+rowBg+';color:#92600e;font-weight:'+(isUQ?'700':'400')+'">'+(isUQ?'Under Query':'')+'</td>';
+    tableRows += '</tr>';
+  });
+
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:20px;background:#ffffff">'
+    + '<p style="'+pS+'">Hi '+displayName+' Team,</p>'
+    + '<p style="'+pS+'">Thank you for the remittance sent,</p>'
+    + '<p style="'+pS+'">Please could you update us regarding the overdue invoices, which is not included in the remittance? If there is invoices under query, please note they are highlighted in yellow for us to process and resolve on our end. No need to update us on those invoices. Please see the table below.</p>'
+    + '<table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin:16px 0">'
+    + '<thead><tr>'
+    + '<th align="left" style="'+thS+'">Invoice No.</th>'
+    + '<th align="left" style="'+thS+'">Ext. Doc No.</th>'
+    + '<th align="left" style="'+thS+'">Doc Type</th>'
+    + '<th align="left" style="'+thS+'">Due Date</th>'
+    + '<th align="right" style="'+thS+'">Amount</th>'
+    + '<th align="left" style="'+thS+'">Status</th>'
+    + '</tr></thead>'
+    + '<tbody>'+tableRows+'</tbody>'
+    + '<tfoot><tr>'
+    + '<td colspan="4" style="padding:10px 14px;border:1px solid '+thBg+';background:'+thBg+';font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;color:#f5ede3">Total Overdue (excl. remittance)</td>'
+    + '<td align="right" style="padding:10px 14px;border:1px solid '+thBg+';background:'+thBg+';font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:14px;color:#f5ede3">'+_fmtCurrency(sym,totalOD)+'</td>'
+    + '<td style="background:'+thBg+';border:1px solid '+thBg+'"></td>'
+    + '</tr></tfoot></table>'
+    + '<p style="'+pS+'">If there is any new inquiries on the invoices outstanding, please kindly update us.</p>'
+    + '<p style="'+pS+'">If you have any questions please let us know.</p>'
+    + '<p style="'+pS+'">Thanks &amp; Regards<br>Pavi</p>'
+    + '</body></html>';
+}
+
+
+async function createRemittanceGmailDraft() {
+  if (!_gmailToken) { toast('warn','Gmail not connected','Connect Gmail first'); return; }
+  if (!_remEmailData) { toast('warn','No draft open','Open a remittance chase email first'); return; }
+  const toEmail = (document.getElementById('rem-email-to')||{}).value||'';
+  if (toEmail) _saveContactFromDraft(_remEmailData.displayName, toEmail);
+  const subject = 'Urgent: Remittance update';
+  const htmlBody = _buildRemittanceEmailHtml(_remEmailData);
+  const mime = [
+    'MIME-Version: 1.0',
+    `To: ${toEmail}`,
+    `Subject: ${subject}`,
+    'Content-Type: text/html; charset="UTF-8"',
+    '',
+    htmlBody
+  ].join('\r\n');
+  const encoded = btoa(unescape(encodeURIComponent(mime))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  try {
+    const resp = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/drafts', {
+      method:'POST',
+      headers:{'Authorization':'Bearer '+_gmailToken,'Content-Type':'application/json'},
+      body: JSON.stringify({message:{raw:encoded}})
+    });
+    if (resp.ok) { toast('ok','Gmail draft created','Check your Drafts folder'); }
+    else {
+      const err = await resp.json().catch(()=>({}));
+      if (resp.status===401) { _gmailToken=null; toast('warn','Gmail token expired','Reconnect Gmail'); }
+      else toast('err','Gmail error',(err.error||{}).message||resp.status);
+    }
+  } catch(e) { toast('err','Gmail failed',e.message); }
+}
+
+// Store statement base64 for email attachment when uploaded via email modal
+let _emailStmtBase64 = null;
+let _emailStmtFileName = '';
+
+
+
+function toggleEmailed(name) {
+  if (_emailedCustomers.has(name)) {
+    _emailedCustomers.delete(name);
+  } else {
+    _emailedCustomers.add(name);
+  }
+  localStorage.setItem('nwi_emailed', JSON.stringify([..._emailedCustomers]));
+  renderBulkEmailsTab();
+}
+
+function openEmailDraftByName(name) {
+  // Search AR first (accurate full names), then SA fallback
+  const c = S.arCustomers.find(x => x.name === name)
+    || S.saCustomers.find(x => x.name === name);
+  if (c) openEmailDraft(c);
+  else toast('warn','Customer not found','Run CreditFlow to load data first');
+}
+
+// Drag-and-drop for email draft statement zone
+(function(){
+  const zone = document.getElementById('edraft-stmt-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0]; if(!file) return;
+    const input = document.getElementById('edraft-stmt-input');
+    const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+    handleEmailStmtUpload(input);
+  });
+})();
+</script>
+</body>
+</html>
